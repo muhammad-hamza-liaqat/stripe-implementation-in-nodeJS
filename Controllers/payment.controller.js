@@ -35,7 +35,52 @@ const addCustomer = async (req, res) => {
     return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
 };
-const addCard = async (req, res) => {};
+const addCard = async (req, res) => {
+  const {
+    customer_id,
+    card_name,
+    card_EXP_YEAR,
+    card_EXP_MONTH,
+    card_number,
+    card_CVC,
+  } = req.body;
+  console.log("body", req.body);
+  if (
+    !customer_id ||
+    !card_name ||
+    !card_EXP_MONTH ||
+    !card_EXP_YEAR ||
+    !card_number ||
+    !card_CVC
+  ) {
+    return res
+      .status(statusCodes.CONFLICT)
+      .json({ message: "all fields are required!!" });
+  }
+  try {
+    const card_token = await stripe.tokens.create({
+      card: {
+        customer: customer_id, // Changed to "customer" instead of "customer_id"
+        name: card_name,
+        number: card_number,
+        exp_year: card_EXP_YEAR,
+        exp_month: card_EXP_MONTH,
+        cvc: card_CVC,
+      },
+    });
+    const card = await stripe.customers.createSource({
+      customer: customer_id, // Changed to "customer" instead of "customer_id"
+      source: `${card_token.id}`,
+    });
+    return res
+      .status(statusCodes.OK)
+      .json({ message: "Card added successfully!", card: card });
+  } catch (error) {
+    console.log("an error occurred in addCard controller code", error);
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+  }
+};
+
 const createPayment = async (req, res) => {};
 
 module.exports = {
