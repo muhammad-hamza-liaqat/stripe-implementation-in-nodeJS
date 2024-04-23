@@ -12,7 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 const homeRoutes = require("./routes/home.routes");
+const paymentRoutes = require("./routes/payment.routes");
 app.use("/", homeRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // server
 app.listen(process.env.PORT, () => {
