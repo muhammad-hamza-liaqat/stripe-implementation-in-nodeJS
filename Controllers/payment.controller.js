@@ -60,7 +60,7 @@ const addCard = async (req, res) => {
   try {
     const card_token = await stripe.tokens.create({
       card: {
-        customer: customer_id, // Changed to "customer" instead of "customer_id"
+        customer: customer_id,
         name: card_name,
         number: card_number,
         exp_year: card_EXP_YEAR,
@@ -69,7 +69,7 @@ const addCard = async (req, res) => {
       },
     });
     const card = await stripe.customers.createSource({
-      customer: customer_id, // Changed to "customer" instead of "customer_id"
+      customer: customer_id,
       source: `${card_token.id}`,
     });
     return res
