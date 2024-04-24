@@ -157,15 +157,11 @@ const createPayment = async (req, res) => {};
 // };
 
 const createPaymentIntent = async (req, res) => {
-  const { amount, currency, paymentMethodType, name, email, phone, address } = req.body;
-  console.log("req.body", req.body);
-
+  const { amount, currency, name, email } = req.body;
   try {
     const customer = await stripe.customers.create({
       name: name,
-      email: email,
-      phone: phone,
-      address: address
+      email: email
     });
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customer.id },
@@ -173,7 +169,7 @@ const createPaymentIntent = async (req, res) => {
     );
 
     const paymentMethod = await stripe.paymentMethods.create({
-      type: paymentMethodType,
+      type: "card", // Set paymentMethodType to "card"
       card: {
         number: req.body.cardNumber,
         exp_month: req.body.expMonth,
@@ -192,7 +188,7 @@ const createPaymentIntent = async (req, res) => {
       return_url: "https://example.com/checkout/success" 
     });
 
-    console.log("PaymentIntent created:", paymentIntent.id);
+    // console.log("PaymentIntent created:", paymentIntent.id);
 
     return res.status(statusCodes.StatusCodes.OK).json({
       clientSecret: paymentIntent.client_secret,
@@ -206,6 +202,9 @@ const createPaymentIntent = async (req, res) => {
 };
 
 
+const renderPaymentIntent = async (req,res)=>{
+  res.render("payment.pug")
+}
 
 
 
@@ -214,4 +213,5 @@ module.exports = {
   addCustomer,
   createPayment,
   createPaymentIntent,
+  renderPaymentIntent
 };
