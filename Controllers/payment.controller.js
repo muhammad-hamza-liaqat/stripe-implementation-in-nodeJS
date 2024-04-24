@@ -157,11 +157,16 @@ const createPayment = async (req, res) => {};
 // };
 
 const createPaymentIntent = async (req, res) => {
-  const { amount, currency, paymentMethodType } = req.body;
+  const { amount, currency, paymentMethodType, name, email, phone, address } = req.body;
   console.log("req.body", req.body);
 
   try {
-    const customer = await stripe.customers.create();
+    const customer = await stripe.customers.create({
+      name: name,
+      email: email,
+      phone: phone,
+      address: address
+    });
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customer.id },
       { apiVersion: "2022-08-01" }
