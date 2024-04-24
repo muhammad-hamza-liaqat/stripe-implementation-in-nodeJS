@@ -129,8 +129,26 @@ const addCard = async (req, res) => {
 
 const createPayment = async (req, res) => {};
 
+const createPaymentIntent = async (req, res) => {
+  const { amount, currency } = req.body;
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: currency,
+    });
+    console.log("client_secret", paymentIntent.client_secret);
+    return res
+      .status(statusCodes.StatusCodes.OK)
+      .json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.log("an error occured at createPaymentIntent", error);
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+  }
+};
+
 module.exports = {
   addCard,
   addCustomer,
   createPayment,
+  createPaymentIntent,
 };
