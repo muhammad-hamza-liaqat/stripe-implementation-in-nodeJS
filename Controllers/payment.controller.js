@@ -129,22 +129,80 @@ const addCard = async (req, res) => {
 
 const createPayment = async (req, res) => {};
 
+// const createPaymentIntent = async (req, res) => {
+//   const { amount, currency } = req.body;
+//   console.log("req.body", req.body);
+
+//   try {
+//     const customer = await stripe.customers.create();
+//     const ephemeralKey = await stripe.ephemeralKeys.create(
+//       { customer: customer.id },
+//       { apiVersion: "2022-08-01" }
+//     );
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: amount,
+//       currency: currency,
+//       customer: customer.id,
+//       // automatic_payment_methods: { enabled: true }
+//       payment_method_types: ["card"]
+//     });
+//     console.log("client_secret", paymentIntent.client_secret);
+//     return res
+//       .status(statusCodes.StatusCodes.OK)
+//       .json({ clientSecret: paymentIntent.client_secret, customer_id: customer.id,ephemeralKey: ephemeralKey.secret});
+//   } catch (error) {
+//     console.log("an error occurred at createPaymentIntent", error);
+//     return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+//   }
+// };
+
 const createPaymentIntent = async (req, res) => {
-  const { amount, currency } = req.body;
+  const { amount, currency, paymentMethodType } = req.body;
+  console.log("req.body", req.body);
+
   try {
+    const customer = await stripe.customers.create();
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      { customer: customer.id },
+      { apiVersion: "2022-08-01" }
+    );
+
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: paymentMethodType,
+      card: {
+        number: req.body.cardNumber,
+        exp_month: req.body.expMonth,
+        exp_year: req.body.expYear,
+        cvc: req.body.cvc
+      }
+    });
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: currency,
+      customer: customer.id,
+      payment_method: paymentMethod.id,
+      confirmation_method: "manual", 
+      confirm: true, 
+      return_url: "https://example.com/checkout/success" 
     });
-    console.log("client_secret", paymentIntent.client_secret);
-    return res
-      .status(statusCodes.StatusCodes.OK)
-      .json({ clientSecret: paymentIntent.client_secret });
+
+    console.log("PaymentIntent created:", paymentIntent.id);
+
+    return res.status(statusCodes.StatusCodes.OK).json({
+      clientSecret: paymentIntent.client_secret,
+      customer_id: customer.id,
+      ephemeralKey: ephemeralKey.secret
+    });
   } catch (error) {
-    console.log("an error occured at createPaymentIntent", error);
+    console.log("An error occurred at createPaymentIntent", error);
     return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
 };
+
+
+
+
 
 module.exports = {
   addCard,
