@@ -3,7 +3,7 @@ const stripe = require("stripe")(process.env.secret_key);
 
 const {
   addCustomer,
-  addCard,
+  // addCard,
   createPaymentIntent,
   renderPaymentIntent,
   checkoutSession,
@@ -14,7 +14,7 @@ const {
 const paymentRoutes = express.Router();
 
 paymentRoutes.post("/add-customer", addCustomer);
-paymentRoutes.post("/add-card", addCard);
+// paymentRoutes.post("/add-card", addCard);
 paymentRoutes.post("/create-payment-intent", createPaymentIntent);
 paymentRoutes.get("/create-payment-intent", renderPaymentIntent);
 paymentRoutes.post("/checkout-session", checkoutSession);
