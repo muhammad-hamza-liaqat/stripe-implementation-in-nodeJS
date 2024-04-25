@@ -36,51 +36,51 @@ const addCustomer = async (req, res) => {
   }
 };
 
-const addCard = async (req, res) => {
-  const {
-    customer_id,
-    card_name,
-    card_EXP_YEAR,
-    card_EXP_MONTH,
-    card_number,
-    card_CVC,
-  } = req.body;
-  console.log("body", req.body);
-  if (
-    !customer_id ||
-    !card_name ||
-    !card_EXP_MONTH ||
-    !card_EXP_YEAR ||
-    !card_number ||
-    !card_CVC
-  ) {
-    return res
-      .status(statusCodes.CONFLICT)
-      .json({ message: "All fields are required!!" });
-  }
-  try {
-    const token = await stripe.tokens.create({
-      card: {
-        number: card_number,
-        // number: "4242424242424242",
-        exp_month: card_EXP_MONTH,
-        exp_year: card_EXP_YEAR,
-        cvc: card_CVC,
-      },
-    });
+// const addCard = async (req, res) => {
+//   const {
+//     customer_id,
+//     card_name,
+//     card_EXP_YEAR,
+//     card_EXP_MONTH,
+//     card_number,
+//     card_CVC,
+//   } = req.body;
+//   console.log("body", req.body);
+//   if (
+//     !customer_id ||
+//     !card_name ||
+//     !card_EXP_MONTH ||
+//     !card_EXP_YEAR ||
+//     !card_number ||
+//     !card_CVC
+//   ) {
+//     return res
+//       .status(statusCodes.CONFLICT)
+//       .json({ message: "All fields are required!!" });
+//   }
+//   try {
+//     const token = await stripe.tokens.create({
+//       card: {
+//         number: card_number,
+//         // number: "4242424242424242",
+//         exp_month: card_EXP_MONTH,
+//         exp_year: card_EXP_YEAR,
+//         cvc: card_CVC,
+//       },
+//     });
 
-    const card = await stripe.customers.createSource(customer_id, {
-      source: token.id,
-    });
+//     const card = await stripe.customers.createSource(customer_id, {
+//       source: token.id,
+//     });
 
-    return res
-      .status(statusCodes.OK)
-      .json({ message: "Card added successfully!", card: card });
-  } catch (error) {
-    console.log("An error occurred in addCard controller code", error);
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
-  }
-};
+//     return res
+//       .status(statusCodes.OK)
+//       .json({ message: "Card added successfully!", card: card });
+//   } catch (error) {
+//     console.log("An error occurred in addCard controller code", error);
+//     return res.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+//   }
+// };
 
 const createPaymentIntent = async (req, res) => {
   const { amount, currency, name, email } = req.body;
