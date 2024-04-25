@@ -82,15 +82,12 @@ const addCard = async (req, res) => {
   }
 };
 
-const createPayment = async (req, res) => {};
-
-
 const createPaymentIntent = async (req, res) => {
   const { amount, currency, name, email } = req.body;
   try {
     const customer = await stripe.customers.create({
       name: name,
-      email: email
+      email: email,
     });
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customer.id },
@@ -103,8 +100,8 @@ const createPaymentIntent = async (req, res) => {
         number: req.body.cardNumber,
         exp_month: req.body.expMonth,
         exp_year: req.body.expYear,
-        cvc: req.body.cvc
-      }
+        cvc: req.body.cvc,
+      },
     });
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -113,9 +110,9 @@ const createPaymentIntent = async (req, res) => {
       currency: currency,
       customer: customer.id,
       payment_method: paymentMethod.id,
-      confirmation_method: "manual", 
-      confirm: true, 
-      return_url: "https://example.com/checkout/success" 
+      confirmation_method: "manual",
+      confirm: true,
+      return_url: "https://example.com/checkout/success",
     });
 
     // console.log("PaymentIntent created:", paymentIntent.id);
@@ -123,25 +120,127 @@ const createPaymentIntent = async (req, res) => {
     return res.status(statusCodes.StatusCodes.OK).json({
       clientSecret: paymentIntent.client_secret,
       customer_id: customer.id,
-      ephemeralKey: ephemeralKey.secret
+      ephemeralKey: ephemeralKey.secret,
     });
   } catch (error) {
     console.log("An error occurred at createPaymentIntent", error.code);
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({error: error.code || error});
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.code || error });
   }
 };
 
+const productPage = async (req, res) => {
+  res.render("page.pug");
+};
 
-const renderPaymentIntent = async (req,res)=>{
-  res.render("payment.pug")
-}
+const renderPaymentIntent = async (req, res) => {
+  res.render("payment.pug");
+};
 
+// const checkoutSession = async (req, res) => {
+//   try {
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "node.js and express book",
+//             },
+//             unit_amount: 50 * 100,
+//           },
+//           quantity: 1,
+//         },
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "javascript t-shirt",
+//             },
+//             unit_amount: 20 * 100,
+//           },
+//           quantity: 2,
+//         },
+//       ],
+//       mode: "payment",
+//       success_url: `http://localhost:3000/api/payment/complete?session_id =${session.id}`,
+//       cancel_url: "http://localhost:3000/cancel",
+//     });
 
+//     //  return res.status(statusCodes.OK).json({ sessionId: session.id });
+//     return res.redirect(session.url);
+//   } catch (error) {
+//     console.error("Error creating checkout session:", error.message || error);
+//     return res
+//       .status(statusCodes.INTERNAL_SERVER_ERROR)
+//       .json("error:", error.message || error);
+//   }
+// };
+
+const checkoutSession = async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "node.js and express book",
+            },
+            unit_amount: 50 * 100,
+          },
+          quantity: 1,
+        },
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "javascript t-shirt",
+            },
+            unit_amount: 20 * 100,
+          },
+          quantity: 2,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:3000/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: "http://localhost:3000/cancel",
+    });
+
+    // Redirect to Stripe Checkout page
+    return res.redirect(session.url);
+  } catch (error) {
+    console.error("Error creating checkout session:", error.message || error);
+    return res.status(500).json({ error: error.message || error });
+  }
+};
+
+const complete = async (req, res) => {
+  const result = Promise.all([
+    stripe.checkout.sessions.retrieve(req.query.session_id, {
+      expand: ["payment_intent.payment_method"],
+    }),
+    stripe.checkout.sessions.listLineItems(req.query.session_id),
+  ]);
+  console.log(JSON.stringify(await result));
+  return res
+    .status(statusCodes.OK)
+    .json({ message: "your payment was successful!" });
+};
+const cancel = async (req, res) => {
+  res.render("page.pug");
+};
 
 module.exports = {
   addCard,
   addCustomer,
-  createPayment,
   createPaymentIntent,
-  renderPaymentIntent
+  renderPaymentIntent,
+  checkoutSession,
+  productPage,
+  complete,
+  cancel
 };

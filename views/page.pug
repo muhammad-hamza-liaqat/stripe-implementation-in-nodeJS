@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Shopping Cart
+  body
+    h1 Shopping Cart
+    h3 Node.js and Express book
+    p Price: $50.00
+    p Quantity: 1
+    br
+    h3 JavaScript T-Shirt
+    p Price: $20.00
+    p Quantity: 2
+    form(action="/api/payment/checkout-session", method="post")
+      input(type="submit", value="Proceed to Checkout")
