@@ -150,7 +150,7 @@ const checkoutSession = async (req, res) => {
             product_data: {
               name: "node.js and express book",
             },
-            unit_amount: 60 * 100,
+            unit_amount: 500 * 100,
           },
           quantity: 1,
         },
