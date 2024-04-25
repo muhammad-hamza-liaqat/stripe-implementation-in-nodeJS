@@ -138,51 +138,11 @@ const renderPaymentIntent = async (req, res) => {
   res.render("payment.pug");
 };
 
-// const checkoutSession = async (req, res) => {
-//   try {
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ["card"],
-//       line_items: [
-//         {
-//           price_data: {
-//             currency: "usd",
-//             product_data: {
-//               name: "node.js and express book",
-//             },
-//             unit_amount: 50 * 100,
-//           },
-//           quantity: 1,
-//         },
-//         {
-//           price_data: {
-//             currency: "usd",
-//             product_data: {
-//               name: "javascript t-shirt",
-//             },
-//             unit_amount: 20 * 100,
-//           },
-//           quantity: 2,
-//         },
-//       ],
-//       mode: "payment",
-//       success_url: `http://localhost:3000/api/payment/complete?session_id =${session.id}`,
-//       cancel_url: "http://localhost:3000/cancel",
-//     });
-
-//     //  return res.status(statusCodes.OK).json({ sessionId: session.id });
-//     return res.redirect(session.url);
-//   } catch (error) {
-//     console.error("Error creating checkout session:", error.message || error);
-//     return res
-//       .status(statusCodes.INTERNAL_SERVER_ERROR)
-//       .json("error:", error.message || error);
-//   }
-// };
-
 const checkoutSession = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card","amazon_pay", "klarna", "us_bank_account"],
+      // payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -190,7 +150,7 @@ const checkoutSession = async (req, res) => {
             product_data: {
               name: "node.js and express book",
             },
-            unit_amount: 50 * 100,
+            unit_amount: 60 * 100,
           },
           quantity: 1,
         },
@@ -225,7 +185,7 @@ const complete = async (req, res) => {
     }),
     stripe.checkout.sessions.listLineItems(req.query.session_id),
   ]);
-  console.log(JSON.stringify(await result));
+  // console.log(JSON.stringify(await result));
   return res
     .status(statusCodes.OK)
     .json({ message: "your payment was successful!" });
@@ -242,5 +202,5 @@ module.exports = {
   checkoutSession,
   productPage,
   complete,
-  cancel
+  cancel,
 };
