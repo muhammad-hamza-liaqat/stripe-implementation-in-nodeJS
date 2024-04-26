@@ -185,7 +185,7 @@ const complete = async (req, res) => {
     }),
     stripe.checkout.sessions.listLineItems(req.query.session_id),
   ]);
-  // console.log(JSON.stringify(await result));
+  console.log(JSON.stringify(await result));
   return res
     .status(statusCodes.OK)
     .json({ message: "your payment was successful!" });
@@ -195,7 +195,7 @@ const cancel = async (req, res) => {
 };
 
 module.exports = {
-  addCard,
+  // addCard,
   addCustomer,
   createPaymentIntent,
   renderPaymentIntent,
