@@ -166,8 +166,8 @@ const checkoutSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:3000/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: "http://localhost:3000/cancel",
+      success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
     });
 
     // Redirect to Stripe Checkout page
@@ -240,8 +240,6 @@ const cancel = async (req, res) => {
 //   }
 // };
 
-
-
 const webHookEvent = async (req, res) => {
   try {
     console.log("Inside webhook handler...");
@@ -260,48 +258,19 @@ const webHookEvent = async (req, res) => {
         .send("Webhook Error: Signature or endpoint secret missing.");
     }
 
-    // Capture raw request body
-    let rawBody = '';
-    req.on('data', (chunk) => {
-      rawBody += chunk;
-    });
+    const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    console.log("Webhook event:", event);
 
-    req.on('end', () => {
-      try {
-        console.log("Constructing Stripe event...");
-        const event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
-        console.log("Webhook event:", event);
+    if (event.type === "checkout.session.completed") {
+      console.log("Checkout session completed:", event.data.object);
+    }
 
-        switch (event.type) {
-          case "checkout.session.async_payment_failed":
-            console.log("Async payment failed:", event.data.object);
-            break;
-          case "checkout.session.async_payment_succeeded":
-            console.log("Async payment succeeded:", event.data.object);
-            break;
-          case "checkout.session.completed":
-            console.log("Checkout session completed:", event.data.object);
-            break;
-          case "checkout.session.expired":
-            console.log("Checkout session expired:", event.data.object);
-            break;
-          default:
-            console.log(`Unhandled event type ${event.type}`);
-        }
-
-        res.send();
-      } catch (err) {
-        console.error("Webhook Error:", err.message);
-        res.status(400).send(`Webhook Error: ${err.message}`);
-      }
-    });
+    res.status(200).end();
   } catch (err) {
-    console.error("Server Error:", err.message);
-    res.status(500).send("Internal Server Error");
+    console.error("Webhook Error:", err.message);
+    res.status(400).send(`Webhook Error: ${err.message}`);
   }
 };
-
-
 
 module.exports = {
   // addCard,
