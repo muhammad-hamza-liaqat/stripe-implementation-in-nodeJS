@@ -6,10 +6,8 @@ const bodyParser = require("body-parser");
 const path = require("path")
 
 // middlewares
-app.use(bodyParser.json());
+app.use(bodyParser.raw({ type: 'application/json' }));
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // template engine
 app.set("view engine", "pug");

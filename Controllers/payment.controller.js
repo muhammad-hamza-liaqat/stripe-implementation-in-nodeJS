@@ -141,7 +141,7 @@ const renderPaymentIntent = async (req, res) => {
 const checkoutSession = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card","amazon_pay", "klarna", "us_bank_account"],
+      payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
       // payment_method_types: ["card"],
       line_items: [
         {
@@ -166,8 +166,8 @@ const checkoutSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:3000/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: "http://localhost:3000/cancel",
+      success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
     });
 
     // Redirect to Stripe Checkout page
@@ -185,13 +185,91 @@ const complete = async (req, res) => {
     }),
     stripe.checkout.sessions.listLineItems(req.query.session_id),
   ]);
-  console.log(JSON.stringify(await result));
+  // console.log(JSON.stringify(await result));
   return res
     .status(statusCodes.OK)
     .json({ message: "your payment was successful!" });
 };
 const cancel = async (req, res) => {
   res.render("page.pug");
+};
+
+// const webHookEvent = async (req, res) => {
+//   try {
+//     console.log("Inside webhook handler...");
+
+//     const sig = req.headers["stripe-signature"];
+//     const endpointSecret =
+//       process.env.endPointSecret || "whsec_Wn4rdUcSxVEOHxYhzKd56iZpO0Av21KI";
+
+//     console.log("Signature:", sig);
+//     console.log("Endpoint Secret:", endpointSecret);
+
+//     if (!sig || !endpointSecret) {
+//       console.error("Webhook Error: Signature or endpoint secret missing.");
+//       return res
+//         .status(400)
+//         .send("Webhook Error: Signature or endpoint secret missing.");
+//     }
+
+//     console.log("Constructing Stripe event...");
+//     const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+//     console.log("Webhook event:", event);
+
+//     switch (event.type) {
+//       case "checkout.session.async_payment_failed":
+//         console.log("Async payment failed:", event.data.object);
+//         break;
+//       case "checkout.session.async_payment_succeeded":
+//         console.log("Async payment succeeded:", event.data.object);
+//         break;
+//       case "checkout.session.completed":
+//         console.log("Checkout session completed:", event.data.object);
+//         break;
+//       case "checkout.session.expired":
+//         console.log("Checkout session expired:", event.data.object);
+//         break;
+//       default:
+//         console.log(`Unhandled event type ${event.type}`);
+//     }
+
+//     res.send();
+//   } catch (err) {
+//     console.error("Webhook Error:", err.message);
+//     res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+// };
+
+const webHookEvent = async (req, res) => {
+  try {
+    console.log("Inside webhook handler...");
+
+    const sig = req.headers["stripe-signature"];
+    const endpointSecret =
+      process.env.endPointSecret || "whsec_ymriCxyZOQnCsZzmiz6iBMjQIjaJLwnZ";
+
+    console.log("Signature:", sig);
+    console.log("Endpoint Secret:", endpointSecret);
+
+    if (!sig || !endpointSecret) {
+      console.error("Webhook Error: Signature or endpoint secret missing.");
+      return res
+        .status(400)
+        .send("Webhook Error: Signature or endpoint secret missing.");
+    }
+
+    const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    console.log("Webhook event:", event);
+
+    if (event.type === "checkout.session.completed") {
+      console.log("Checkout session completed:", event.data.object);
+    }
+
+    res.status(200).end();
+  } catch (err) {
+    console.error("Webhook Error:", err.message);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 };
 
 module.exports = {
@@ -203,4 +281,5 @@ module.exports = {
   productPage,
   complete,
   cancel,
+  webHookEvent,
 };

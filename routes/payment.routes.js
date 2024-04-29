@@ -10,6 +10,7 @@ const {
   productPage,
   complete,
   cancel,
+  webHookEvent,
 } = require("../Controllers/payment.controller");
 const paymentRoutes = express.Router();
 
@@ -20,6 +21,6 @@ paymentRoutes.get("/create-payment-intent", renderPaymentIntent);
 paymentRoutes.post("/checkout-session", checkoutSession);
 paymentRoutes.get("/product", productPage);
 paymentRoutes.get("/complete", complete);
-paymentRoutes.get("/calcel", cancel);
-
+paymentRoutes.get("/cancel", cancel);
+paymentRoutes.post("/webhook", webHookEvent);
 module.exports = paymentRoutes;
