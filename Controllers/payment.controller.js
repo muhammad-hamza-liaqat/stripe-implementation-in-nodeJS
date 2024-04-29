@@ -194,62 +194,16 @@ const cancel = async (req, res) => {
   res.render("page.pug");
 };
 
-// const webHookEvent = async (req, res) => {
-//   try {
-//     console.log("Inside webhook handler...");
-
-//     const sig = req.headers["stripe-signature"];
-//     const endpointSecret =
-//       process.env.endPointSecret || "whsec_Wn4rdUcSxVEOHxYhzKd56iZpO0Av21KI";
-
-//     console.log("Signature:", sig);
-//     console.log("Endpoint Secret:", endpointSecret);
-
-//     if (!sig || !endpointSecret) {
-//       console.error("Webhook Error: Signature or endpoint secret missing.");
-//       return res
-//         .status(400)
-//         .send("Webhook Error: Signature or endpoint secret missing.");
-//     }
-
-//     console.log("Constructing Stripe event...");
-//     const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-//     console.log("Webhook event:", event);
-
-//     switch (event.type) {
-//       case "checkout.session.async_payment_failed":
-//         console.log("Async payment failed:", event.data.object);
-//         break;
-//       case "checkout.session.async_payment_succeeded":
-//         console.log("Async payment succeeded:", event.data.object);
-//         break;
-//       case "checkout.session.completed":
-//         console.log("Checkout session completed:", event.data.object);
-//         break;
-//       case "checkout.session.expired":
-//         console.log("Checkout session expired:", event.data.object);
-//         break;
-//       default:
-//         console.log(`Unhandled event type ${event.type}`);
-//     }
-
-//     res.send();
-//   } catch (err) {
-//     console.error("Webhook Error:", err.message);
-//     res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-// };
-
 const webHookEvent = async (req, res) => {
   try {
-    console.log("Inside webhook handler...");
+    // console.log("Inside webhook handler...");
 
     const sig = req.headers["stripe-signature"];
     // const endpointSecret =
     //   process.env.endPointSecret || "whsec_ymriCxyZOQnCsZzmiz6iBMjQIjaJLwnZ";
     const endpointSecret = process.env.endpointSecret;
-    console.log("Signature:", sig);
-    console.log("Endpoint Secret:", endpointSecret);
+    // console.log("Signature:", sig);
+    // console.log("Endpoint Secret:", endpointSecret);
 
     if (!sig || !endpointSecret) {
       console.error("Webhook Error: Signature or endpoint secret missing.");
@@ -259,7 +213,7 @@ const webHookEvent = async (req, res) => {
     }
 
     const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    console.log("Webhook event:", event);
+    // console.log("Webhook event:", event);
 
     if (event.type === "checkout.session.completed") {
       console.log("Checkout session completed:", event.data.object);
