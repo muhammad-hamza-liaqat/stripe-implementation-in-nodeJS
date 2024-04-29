@@ -138,11 +138,50 @@ const renderPaymentIntent = async (req, res) => {
   res.render("payment.pug");
 };
 
+// const checkoutSession = async (req, res) => {
+//   try {
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
+//       // payment_method_types: ["card"],
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "node.js and express book",
+//             },
+//             unit_amount: 500 * 100,
+//           },
+//           quantity: 1,
+//         },
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "javascript t-shirt",
+//             },
+//             unit_amount: 20 * 100,
+//           },
+//           quantity: 2,
+//         },
+//       ],
+//       mode: "payment",
+//       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
+//     });
+
+//     // Redirect to Stripe Checkout page
+//     return res.redirect(session.url);
+//   } catch (error) {
+//     console.error("Error creating checkout session:", error.message || error);
+//     return res.status(500).json({ error: error.message || error });
+//   }
+// };
+
 const checkoutSession = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
-      // payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -168,6 +207,10 @@ const checkoutSession = async (req, res) => {
       mode: "payment",
       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
+      metadata: {
+        chainId: "03144099558",
+        chainName: "2d_chain"
+      }
     });
 
     // Redirect to Stripe Checkout page
@@ -177,6 +220,7 @@ const checkoutSession = async (req, res) => {
     return res.status(500).json({ error: error.message || error });
   }
 };
+
 
 const complete = async (req, res) => {
   const result = Promise.all([
