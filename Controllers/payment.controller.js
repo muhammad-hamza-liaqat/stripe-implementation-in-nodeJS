@@ -245,9 +245,9 @@ const webHookEvent = async (req, res) => {
     console.log("Inside webhook handler...");
 
     const sig = req.headers["stripe-signature"];
-    const endpointSecret =
-      process.env.endPointSecret || "whsec_ymriCxyZOQnCsZzmiz6iBMjQIjaJLwnZ";
-
+    // const endpointSecret =
+    //   process.env.endPointSecret || "whsec_ymriCxyZOQnCsZzmiz6iBMjQIjaJLwnZ";
+    const endpointSecret = process.env.endpointSecret;
     console.log("Signature:", sig);
     console.log("Endpoint Secret:", endpointSecret);
 
