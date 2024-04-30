@@ -196,8 +196,8 @@ const checkoutSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
+      success_url: `https://9fff-119-155-22-204.ngrok-free.app/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: "https://9fff-119-155-22-204.ngrok-free.app/api/payment/cancel",
       metadata: {
         lineItemsMetadata: JSON.stringify([
           {
@@ -218,17 +218,39 @@ const checkoutSession = async (req, res) => {
 };
 
 const complete = async (req, res) => {
-  const result = Promise.all([
-    stripe.checkout.sessions.retrieve(req.query.session_id, {
-      expand: ["payment_intent.payment_method"],
-    }),
-    stripe.checkout.sessions.listLineItems(req.query.session_id),
-  ]);
-  // console.log(JSON.stringify(await result));
-  return res
-    .status(statusCodes.OK)
-    .json({ message: "your payment was successful!" });
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.query.session_id, {
+      expand: ["payment_intent"],
+    });
+
+    if (!session.payment_intent) {
+      throw new Error("Payment intent not found.");
+    }
+
+    const paymentIntent = session.payment_intent;
+
+    let feeDetails = [];
+    if (paymentIntent.charges && paymentIntent.charges.data) {
+      feeDetails = paymentIntent.charges.data.map(charge => {
+        return {
+          amount: charge.amount,
+          fee: charge.application_fee_amount || 0,
+          currency: charge.currency,
+        };
+      });
+    }
+
+    return res.status(statusCodes.OK).json({
+      message: "Your payment was successful!",
+      payment_intent_id: paymentIntent.id,
+      fees: feeDetails,
+    });
+  } catch (error) {
+    console.error("Error completing payment:", error.message || error);
+    return res.status(500).json({ error: error.message || error });
+  }
 };
+
 const cancel = async (req, res) => {
   res.render("page.pug");
 };
