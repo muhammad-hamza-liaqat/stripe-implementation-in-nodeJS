@@ -139,6 +139,7 @@ const renderPaymentIntent = async (req, res) => {
 };
 
 // const checkoutSession = async (req, res) => {
+  // // wihtout custom object ecommerce 
 //   try {
 //     const session = await stripe.checkout.sessions.create({
 //       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
@@ -187,30 +188,25 @@ const checkoutSession = async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "node.js and express book",
+              name: "2D", // Or any relevant name
             },
             unit_amount: 500 * 100,
           },
           quantity: 1,
-        },
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "javascript t-shirt",
-            },
-            unit_amount: 20 * 100,
-          },
-          quantity: 2,
         },
       ],
       mode: "payment",
       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
       metadata: {
-        chainId: "03144099558",
-        chainName: "2d_chain"
-      }
+        lineItemsMetadata: JSON.stringify([
+          {
+            index: "0",
+            chainID: "660a428a002938f126abfc83",
+            nodeID: "660a428a002938f126abfc84",
+          },
+        ]),
+      },
     });
 
     // Redirect to Stripe Checkout page
@@ -220,7 +216,6 @@ const checkoutSession = async (req, res) => {
     return res.status(500).json({ error: error.message || error });
   }
 };
-
 
 const complete = async (req, res) => {
   const result = Promise.all([
