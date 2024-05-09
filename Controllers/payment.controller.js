@@ -197,8 +197,7 @@ const checkoutSession = async (req, res) => {
       ],
       mode: "payment",
       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:
-        "https://stripe-server.loca.lt/api/payment/cancel",
+      cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
       metadata: {
         lineItemsMetadata: JSON.stringify([
           {
@@ -234,11 +233,16 @@ const complete = async (req, res) => {
       throw new Error("Customer email not found in session");
     }
 
-    // Create a customer
-    const customer = await stripe.customers.create({
-      email: email,
-      name: customerDetails.name, 
-    });
+    let customer;
+    const existingCustomers = await stripe.customers.list({ email: email });
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0];
+    } else {
+      customer = await stripe.customers.create({
+        email: email,
+        name: customerDetails.name,
+      });
+    }
 
     const customerId = customer.id;
 
@@ -247,10 +251,11 @@ const complete = async (req, res) => {
       .json({ message: "Your payment was successful!", customerId });
   } catch (error) {
     console.error("Error completing payment:", error);
-    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.message });
   }
 };
-
 
 const cancel = async (req, res) => {
   res.render("page.pug");
@@ -285,6 +290,25 @@ const webHookEvent = async (req, res) => {
   } catch (err) {
     console.error("Webhook Error:", err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+};
+
+const payoutToBankAccount = async (req, res) => {
+  try {
+    const transfer = await stripe.transfers.create({
+      amount: req.body.amount * 100,
+      currency: req.body.currency,
+      destination: req.body.bank_account_id,
+    });
+
+    return res
+      .status(statusCodes.OK)
+      .json({ message: "Payout successful!", transfer });
+  } catch (error) {
+    console.error("Error processing payout:", error);
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.message });
   }
 };
 
