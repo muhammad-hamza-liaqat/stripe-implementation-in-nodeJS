@@ -293,22 +293,27 @@ const webHookEvent = async (req, res) => {
   }
 };
 
-const payoutToBankAccount = async (req, res) => {
+const transferFunds = async (req, res) => {
+  const { amount, currency, destinationBankAccount } = req.body;
+  console.log("{req.body}- incoming", req.body);
+
   try {
-    const transfer = await stripe.transfers.create({
-      amount: req.body.amount * 100,
-      currency: req.body.currency,
-      destination: req.body.bank_account_id,
+    const payout = await stripe.payouts.create({
+      amount: amount * 100,
+      currency: currency,
+      destination: {
+        type: "bank_account",
+        account_number: destinationBankAccount,
+        currency: currency,
+      },
     });
 
-    return res
-      .status(statusCodes.OK)
-      .json({ message: "Payout successful!", transfer });
+    console.log("Payout successful:", payout);
+
+    return res.status(201).json(payout);
   } catch (error) {
-    console.error("Error processing payout:", error);
-    return res
-      .status(statusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: error.message });
+    console.error("Error transferring funds:", error);
+    return res.status(500).json(error.message || error);
   }
 };
 
@@ -322,4 +327,5 @@ module.exports = {
   complete,
   cancel,
   webHookEvent,
+  transferFunds,
 };

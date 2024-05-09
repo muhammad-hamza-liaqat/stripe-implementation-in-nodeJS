@@ -11,6 +11,7 @@ const {
   complete,
   cancel,
   webHookEvent,
+  transferFunds,
 } = require("../Controllers/payment.controller");
 const paymentRoutes = express.Router();
 
@@ -23,4 +24,5 @@ paymentRoutes.get("/product", productPage);
 paymentRoutes.get("/complete", complete);
 paymentRoutes.get("/cancel", cancel);
 paymentRoutes.post("/webhook", webHookEvent);
+paymentRoutes.post("/transfer", transferFunds)
 module.exports = paymentRoutes;

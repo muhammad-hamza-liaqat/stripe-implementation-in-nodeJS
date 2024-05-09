@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const path = require("path")
 
 // middlewares
+app.use(express.json());
 app.use(bodyParser.raw({ type: 'application/json' }));
 app.use(cors());
 
