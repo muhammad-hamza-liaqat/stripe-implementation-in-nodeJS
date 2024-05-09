@@ -139,7 +139,7 @@ const renderPaymentIntent = async (req, res) => {
 };
 
 // const checkoutSession = async (req, res) => {
-  // // wihtout custom object ecommerce 
+// // wihtout custom object ecommerce
 //   try {
 //     const session = await stripe.checkout.sessions.create({
 //       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
@@ -196,8 +196,9 @@ const checkoutSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `https://9fff-119-155-22-204.ngrok-free.app/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: "https://9fff-119-155-22-204.ngrok-free.app/api/payment/cancel",
+      success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:
+        "https://stripe-server.loca.lt/api/payment/cancel",
       metadata: {
         lineItemsMetadata: JSON.stringify([
           {
@@ -219,37 +220,37 @@ const checkoutSession = async (req, res) => {
 
 const complete = async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.retrieve(req.query.session_id, {
-      expand: ["payment_intent"],
-    });
+    const [session, lineItems] = await Promise.all([
+      stripe.checkout.sessions.retrieve(req.query.session_id, {
+        expand: ["payment_intent.payment_method"],
+      }),
+      stripe.checkout.sessions.listLineItems(req.query.session_id),
+    ]);
 
-    if (!session.payment_intent) {
-      throw new Error("Payment intent not found.");
+    const customerDetails = session.customer_details;
+    const email = customerDetails.email;
+
+    if (!email) {
+      throw new Error("Customer email not found in session");
     }
 
-    const paymentIntent = session.payment_intent;
-
-    let feeDetails = [];
-    if (paymentIntent.charges && paymentIntent.charges.data) {
-      feeDetails = paymentIntent.charges.data.map(charge => {
-        return {
-          amount: charge.amount,
-          fee: charge.application_fee_amount || 0,
-          currency: charge.currency,
-        };
-      });
-    }
-
-    return res.status(statusCodes.OK).json({
-      message: "Your payment was successful!",
-      payment_intent_id: paymentIntent.id,
-      fees: feeDetails,
+    // Create a customer
+    const customer = await stripe.customers.create({
+      email: email,
+      name: customerDetails.name, 
     });
+
+    const customerId = customer.id;
+
+    return res
+      .status(statusCodes.OK)
+      .json({ message: "Your payment was successful!", customerId });
   } catch (error) {
-    console.error("Error completing payment:", error.message || error);
-    return res.status(500).json({ error: error.message || error });
+    console.error("Error completing payment:", error);
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
+
 
 const cancel = async (req, res) => {
   res.render("page.pug");
