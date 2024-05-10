@@ -294,18 +294,29 @@ const webHookEvent = async (req, res) => {
 };
 
 const transferFunds = async (req, res) => {
-  const { amount, currency, destinationBankAccount } = req.body;
-  console.log("{req.body}- incoming", req.body);
+  const { amount, currency, destination } = req.body;
+
+  console.log("Incoming request body:", req.body);
 
   try {
+    if (!destination || !destination.account_number) {
+      return res
+        .status(400)
+        .json({ message: "Missing destination account number" });
+    }
+
+    const payoutDestination = {
+      type: "bank_account",
+      account_number: destination.account_number,
+      currency: currency,
+    };
+
+    console.log("Payout destination:", payoutDestination);
+
     const payout = await stripe.payouts.create({
       amount: amount * 100,
       currency: currency,
-      destination: {
-        type: "bank_account",
-        account_number: destinationBankAccount,
-        currency: currency,
-      },
+      destination: JSON.stringify(payoutDestination),
     });
 
     console.log("Payout successful:", payout);
