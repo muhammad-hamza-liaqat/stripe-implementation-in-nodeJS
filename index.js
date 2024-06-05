@@ -17,8 +17,10 @@ app.set("views", path.join(__dirname, "views"));
 // routes
 const homeRoutes = require("./routes/home.routes");
 const paymentRoutes = require("./routes/payment.routes");
+const stripeRoutes = require("./routes/stripe.routes");
 app.use("/", homeRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/stripe", stripeRoutes);
 
 // server
 app.listen(process.env.PORT, () => {

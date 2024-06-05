@@ -328,6 +328,15 @@ const transferFunds = async (req, res) => {
   }
 };
 
+// correct code
+
+// const transfer = await stripe.transfers.create({
+//   amount: amount,
+//   currency: currency,
+//   destination: destinationAccountId,
+// });
+
+
 module.exports = {
   // addCard,
   addCustomer,

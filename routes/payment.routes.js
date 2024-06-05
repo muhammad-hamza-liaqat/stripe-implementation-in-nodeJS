@@ -1,6 +1,4 @@
 const express = require("express");
-const stripe = require("stripe")(process.env.secret_key);
-
 const {
   addCustomer,
   // addCard,
