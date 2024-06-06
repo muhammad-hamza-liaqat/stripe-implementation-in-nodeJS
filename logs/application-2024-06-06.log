@@ -1,0 +1,14 @@
+2024-06-06 10:26:23 info: POST /stripe/account
+2024-06-06 10:55:37 info: POST /stripe/account
+2024-06-06 10:56:32 info: POST /stripe/account
+2024-06-06 10:59:03 info: POST /stripe/account
+2024-06-06 11:00:09 info: POST /stripe/account
+2024-06-06 11:02:30 info: POST /stripe/account
+2024-06-06 11:03:12 info: POST /stripe/account
+2024-06-06 11:04:50 info: POST /stripe/account
+2024-06-06 11:12:24 info: POST /stripe/account
+2024-06-06 11:12:31 info: POST /account - 6,885.029 ms
+2024-06-06 11:44:21 info: POST /stripe/account
+2024-06-06 11:44:27 info: POST /account - 5,709.493 ms
+2024-06-06 11:49:50 info: POST /stripe/account
+2024-06-06 11:49:56 info: POST /account - 5,839.803 ms

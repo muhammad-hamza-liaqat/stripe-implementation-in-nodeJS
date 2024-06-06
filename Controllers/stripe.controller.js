@@ -27,51 +27,94 @@ const stripe = require("stripe")(process.env.secret_key)
 // }
 
 
-
-const fetchAndUpdateTerms = async (accountId, ipAddress) => {
-    try {
-        await stripe.accounts.update(accountId, {
-            tos_acceptance: {
-                date: Math.floor(Date.now() / 1000),
-                ip: ipAddress,
-            },
-        });
-        console.log("Terms and conditions acceptance updated successfully.");
-    } catch (error) {
-        console.error("Failed to update terms and conditions acceptance:", error.message);
-        throw error;
-    }
-}
-
 const createAccount = async (req, res) => {
     try {
-        const acceptedTerms = true;
+        const user = {
+            firstName: "Muhammad",
+            lastName: "Hamza",
+            email: "m.hamza1782@gmail.com",
+            country: "US",
+            stripeAccountId: null,
+            ip: "127.0.0.1",
+            prefill: true,
+            type: "individual"
+        }
 
-        console.log("secretKey", process.env.secret_key);
-        const account = await stripe.accounts.create({
-            type: "custom",
-            capabilities: {
-                card_payments: { requested: true },
-                transfers: { requested: true }
+        if (user.type !== 'individual') {
+            return res.status(400).send({ error: 'User type must be individual' });
+        }
+
+        let accountId = user.stripeAccountId;
+        const shouldPrefill = user.prefill;
+
+        if (!accountId) {
+            let bankAccount;
+            if (shouldPrefill) {
+                bankAccount = await stripe.tokens.create({
+                    bank_account: {
+                        country: 'US',
+                        currency: 'usd',
+                        account_holder_name: `${user.firstName} ${user.lastName}`,
+                        account_holder_type: 'individual',
+                        routing_number: '110000000',
+                        account_number: '000123456789',
+                    },
+                });
             }
-        });
-        console.log("account ", account);
 
-        const userIpAddress = "127.0.0.1";
+            const accountParams = {
+                type: 'express',
+                country: user.country || 'US',
+                email: user.email || undefined,
+                capabilities: {
+                    card_payments: { requested: true },
+                    transfers: { requested: true },
+                },
+                business_type: 'individual',
+                individual: {
+                    first_name: user.firstName || undefined,
+                    last_name: user.lastName || undefined,
+                    email: user.email || undefined,
+                    ...(shouldPrefill ? {
+                        id_number: '000000000',
+                        address: {
+                            line1: 'address_full_match',
+                            city: 'South San Francisco',
+                            country: 'US',
+                            state: 'CA',
+                            postal_code: '94080',
+                        },
+                        dob: {
+                            day: 1,
+                            month: 1,
+                            year: 1901,
+                        },
+                        phone: '8888675309',
+                        ssn_last_4: '0000',
+                    } : {}),
+                },
+                ...(bankAccount ? { external_account: bankAccount.id } : {}),
+            };
 
-        await fetchAndUpdateTerms(account.id, userIpAddress);
+            const account = await stripe.accounts.create(accountParams);
+            accountId = account.id;
+            user.stripeAccountId = accountId;
+
+            console.log("user after creation -------------------------------------->", user);
+
+        }
 
         const accountLink = await stripe.accountLinks.create({
-            account: account.id,
+            account: accountId,
             refresh_url: 'https://google.com/',
-            return_url: 'https://yahoo.com/',
-            type: "account_onboarding",
+            return_url: 'https://main.d3gzu5jixwdx96.amplifyapp.com/',
+            type: 'account_onboarding',
         });
 
-        return res.status(200).json({ accountID: account.id, url: accountLink.url });
+        return res.status(200).json({ accountId, url: accountLink.url });
     } catch (error) {
-        console.error("an error occurred", error.message);
-        return res.status(500).json({ message: "internal server error", error: error.message });
+        console.error(`Failed to create a Stripe account: ${error}`);
+        res.status(500).send({ message: "internal server error", error: error.message });
     }
 }
 
