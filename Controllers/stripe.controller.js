@@ -1,5 +1,6 @@
 const stripe = require("stripe")(process.env.secret_key)
 
+// this code will generate user connected account and generate the link to fill all the other required information
 // const createAccount = async (req, res) => {
 //     try {
 //         console.log("secretKey",process.env.secret_key)
@@ -28,6 +29,7 @@ const stripe = require("stripe")(process.env.secret_key)
 
 
 const createAccount = async (req, res) => {
+    // this code will create the connected account and fill all the required information static.
     try {
         const user = {
             firstName: "Muhammad",
@@ -118,4 +120,26 @@ const createAccount = async (req, res) => {
     }
 }
 
-module.exports = { createAccount };
+
+const payoutStripe = async (req, res) => {
+    // this code will create payout from the connected account to it's external bank account.
+    try {
+        const { amount, currency, stripeAccount } = req.body;
+
+        const payout = await stripe.payouts.create({
+            amount: amount * 100,
+            currency: currency,
+        }, {
+            stripeAccount: stripeAccount
+        });
+        let response = {payoutId: payout.id, amount: payout.amount / 100, destination: payout?.destination, method: payout.method}
+        return res.status(201).json({ message: "Payout created", response });
+    } catch (error) {
+        console.error("Error:", error.message);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+}
+
+
+
+module.exports = { createAccount, payoutStripe };
