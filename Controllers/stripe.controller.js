@@ -120,7 +120,6 @@ const createAccount = async (req, res) => {
     }
 }
 
-
 // const payoutStripe = async (req, res) => {
 //     // this code will create payout from the connected account to it's external bank account.
 //     try {
@@ -140,7 +139,6 @@ const createAccount = async (req, res) => {
 //         return res.status(500).json({ message: "Internal server error", error: error.message });
 //     }
 // }
-
 
 const payoutStripe = async (req, res) => {
     try {
@@ -192,6 +190,37 @@ const payoutStripe = async (req, res) => {
     }
 }
 
+const createStripeCustomer = async (req, res) => {
+    const { email, paymentMethods, ...data } = req.body;
+
+    try {
+        const customer = await stripe.customers.create({
+            email: email,
+            ...data
+        });
+
+        for (const paymentMethodId of paymentMethods) {
+            await stripe.paymentMethods.attach(paymentMethodId, {
+                customer: customer.id,
+            });
+        }
+
+        if (paymentMethods.length > 0) {
+            await stripe.customers.update(customer.id, {
+                invoice_settings: {
+                    default_payment_method: paymentMethods[0],
+                }
+            });
+        }
+
+        return res.status(201).json({ statusCode: 201, message: "Customer created successfully!", data: customer });
+
+    } catch (error) {
+        console.error("An error occurred: ", error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
 
 
-module.exports = { createAccount, payoutStripe };
+
+module.exports = { createAccount, payoutStripe, createStripeCustomer };

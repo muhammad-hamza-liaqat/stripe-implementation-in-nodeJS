@@ -68,3 +68,9 @@
 2024-06-21 11:43:12 info: POST /payout - 9,129.998 ms
 2024-06-21 11:47:56 info: POST /stripe/payout
 2024-06-21 11:47:58 info: POST /payout - 1,836.635 ms
+2024-06-21 15:54:25 info: POST /stripe/add-customer
+2024-06-21 15:54:29 info: POST /add-customer - 4,602.126 ms
+2024-06-21 15:56:37 info: POST /stripe/add-customer
+2024-06-21 15:56:49 info: POST /add-customer - 12,549.09 ms
+2024-06-21 15:59:09 info: POST /stripe/add-customer
+2024-06-21 15:59:14 info: POST /add-customer - 4,418.084 ms
