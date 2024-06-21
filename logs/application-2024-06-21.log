@@ -1,0 +1,26 @@
+2024-06-21 09:45:00 info: POST /stripe/account
+2024-06-21 09:45:08 info: POST /account - 7,596.867 ms
+2024-06-21 09:50:26 info: POST /stripe/payout
+2024-06-21 09:50:28 info: POST /payout - 1,889.763 ms
+2024-06-21 09:53:24 info: POST /stripe/payout
+2024-06-21 09:53:26 info: POST /payout - 1,887.804 ms
+2024-06-21 09:55:09 info: POST /stripe/payout
+2024-06-21 09:55:11 info: POST /payout - 2,051.703 ms
+2024-06-21 09:55:18 info: POST /stripe/payout
+2024-06-21 09:55:18 info: POST /payout - 604.999 ms
+2024-06-21 09:55:25 info: POST /stripe/payout
+2024-06-21 09:55:25 info: POST /payout - 620.951 ms
+2024-06-21 09:55:34 info: POST /stripe/payout
+2024-06-21 09:55:34 info: POST /payout - 622.643 ms
+2024-06-21 09:57:14 info: POST /stripe/payout
+2024-06-21 09:57:17 info: POST /payout - 2,532.943 ms
+2024-06-21 09:58:25 info: POST /stripe/payout
+2024-06-21 09:58:29 info: POST /payout - 3,526.192 ms
+2024-06-21 09:59:40 info: POST /stripe/payout
+2024-06-21 09:59:44 info: POST /payout - 4,188.174 ms
+2024-06-21 10:06:36 info: POST /stripe/payout
+2024-06-21 10:06:38 info: POST /payout - 1,843.415 ms
+2024-06-21 10:10:38 info: POST /stripe/payout
+2024-06-21 10:10:42 info: POST /payout - 3,634.086 ms
+2024-06-21 10:11:31 info: POST /stripe/payout
+2024-06-21 10:11:34 info: POST /payout - 2,948.97 ms

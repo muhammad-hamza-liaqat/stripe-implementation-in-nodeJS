@@ -1,0 +1,12 @@
+2024-06-13 16:23:26 info: POST /api/paymentcheckout-session
+2024-06-13 16:23:26 info: POST /api/paymentcheckout-session - 7.648 ms
+2024-06-13 16:23:58 info: GET /api/payment/product
+2024-06-13 16:23:58 info: GET /product - 290.659 ms
+2024-06-13 16:23:58 info: GET /favicon.ico
+2024-06-13 16:23:58 info: GET /favicon.ico - 3.089 ms
+2024-06-13 16:24:03 info: POST /api/payment/checkout-session
+2024-06-13 16:24:04 info: POST /checkout-session - 1,177.546 ms
+2024-06-13 16:26:39 info: GET /api/payment/product
+2024-06-13 16:26:39 info: GET /product - 17.695 ms
+2024-06-13 16:26:47 info: POST /api/payment/checkout-session
+2024-06-13 16:26:48 info: POST /checkout-session - 922.331 ms

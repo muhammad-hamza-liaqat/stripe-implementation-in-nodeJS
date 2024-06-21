@@ -121,24 +121,78 @@ const createAccount = async (req, res) => {
 }
 
 
+// const payoutStripe = async (req, res) => {
+//     // this code will create payout from the connected account to it's external bank account.
+//     try {
+//         const { amount, currency, stripeAccount } = req.body;
+
+//         const payout = await stripe.payouts.create({
+//             amount: amount * 100,
+//             currency: currency,
+//             // method: "instant"
+//         }, {
+//             stripeAccount: stripeAccount
+//         });
+//         let response = { payoutId: payout.id, amount: payout.amount / 100, destination: payout?.destination, method: payout.method }
+//         return res.status(201).json({ message: "Payout created", response });
+//     } catch (error) {
+//         console.error("Error:", error.message);
+//         return res.status(500).json({ message: "Internal server error", error: error.message });
+//     }
+// }
+
+
 const payoutStripe = async (req, res) => {
-    // this code will create payout from the connected account to it's external bank account.
     try {
         const { amount, currency, stripeAccount } = req.body;
 
+        // Log the incoming request
+        console.log(`Payout request: amount=${amount}, currency=${currency}, stripeAccount=${stripeAccount}`);
+
+        // Check balance
+        const balance = await stripe.balance.retrieve({ stripeAccount });
+        console.log(`Balance for account ${stripeAccount}:`, balance);
+
+        if (balance.available[0].amount < amount * 100) {
+            return res.status(400).json({ message: "Insufficient funds" });
+        }
+
+        // Retrieve and log account details
+        const account = await stripe.accounts.retrieve(stripeAccount);
+        console.log(`Account capabilities for ${stripeAccount}:`, account.capabilities);
+        console.log(`Account requirements for ${stripeAccount}:`, account.requirements);
+
+        // Retrieve and log external accounts
+        const externalAccounts = await stripe.accounts.listExternalAccounts(
+            stripeAccount,
+            { object: 'bank_account' }
+        );
+        console.log(`External accounts for ${stripeAccount}:`, externalAccounts);
+
+        // Check if there is a verified external bank account
+        if (externalAccounts.data.length === 0) {
+            return res.status(400).json({ message: "No verified external bank account found" });
+        }
+
+        // Create payout
         const payout = await stripe.payouts.create({
             amount: amount * 100,
             currency: currency,
+            // method: "instant"
         }, {
             stripeAccount: stripeAccount
         });
-        let response = {payoutId: payout.id, amount: payout.amount / 100, destination: payout?.destination, method: payout.method}
+
+        let response = { payoutId: payout.id, amount: payout.amount / 100, destination: payout?.destination, method: payout.method };
         return res.status(201).json({ message: "Payout created", response });
+
     } catch (error) {
         console.error("Error:", error.message);
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
+
+
 
 
 
