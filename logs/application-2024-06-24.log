@@ -85,3 +85,5 @@
 2024-06-24 16:03:31 info: GET /cards/cus_QLsFvf7I1SFq04 - 1,220.651 ms
 2024-06-24 16:03:53 info: GET /api/stripe/cards/cus_QLsFvf7I1SFq04
 2024-06-24 16:03:54 info: GET /cards/cus_QLsFvf7I1SFq04 - 1,071.996 ms
+2024-06-24 16:15:06 info: PATCH /api/stripe/default-card/cus_QLsFvf7I1SFq04/card_1PVAWgGi1bsyWjuiqTYBS2fK
+2024-06-24 16:15:08 info: PATCH /default-card/cus_QLsFvf7I1SFq04/card_1PVAWgGi1bsyWjuiqTYBS2fK - 2,390.105 ms
