@@ -1,0 +1,15 @@
+2024-06-24 11:32:52 info: POST /api/stripe/account
+2024-06-24 11:33:01 info: POST /account - 9,101.442 ms
+2024-06-24 11:49:21 info: GET /api/payment/transfer
+2024-06-24 11:49:21 info: GET /api/payment/transfer - 6.415 ms
+2024-06-24 11:49:26 info: POST /api/payment/transfer
+2024-06-24 11:50:32 info: POST /api/payment/transfer
+2024-06-24 11:50:36 info: POST /transfer - 3,626.385 ms
+2024-06-24 11:54:03 info: POST /api/payment/transfer
+2024-06-24 11:54:18 info: POST /transfer - 15,034.518 ms
+2024-06-24 12:02:53 info: POST /api/stripe/payout
+2024-06-24 12:02:56 info: POST /payout - 2,458.319 ms
+2024-06-24 12:06:59 info: POST /api/stripe/payout
+2024-06-24 12:06:59 info: POST /payout - 15.115 ms
+2024-06-24 12:07:07 info: POST /api/stripe/payout
+2024-06-24 12:07:08 info: POST /payout - 990.239 ms

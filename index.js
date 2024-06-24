@@ -28,7 +28,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const stripeRoutes = require("./routes/stripe.routes");
 app.use("/", homeRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/stripe", stripeRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 // server
 app.listen(process.env.PORT, () => {
