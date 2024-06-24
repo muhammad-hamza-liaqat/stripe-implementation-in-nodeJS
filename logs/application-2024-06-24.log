@@ -13,3 +13,9 @@
 2024-06-24 12:06:59 info: POST /payout - 15.115 ms
 2024-06-24 12:07:07 info: POST /api/stripe/payout
 2024-06-24 12:07:08 info: POST /payout - 990.239 ms
+2024-06-24 12:13:09 info: POST /api/payment/transfer
+2024-06-24 12:13:23 info: POST /transfer - 14,741.726 ms
+2024-06-24 12:16:20 info: POST /api/payment/transfer
+2024-06-24 12:16:30 info: POST /transfer - 10,255.393 ms
+2024-06-24 12:18:31 info: POST /api/stripe/payout
+2024-06-24 12:18:33 info: POST /payout - 2,409.02 ms

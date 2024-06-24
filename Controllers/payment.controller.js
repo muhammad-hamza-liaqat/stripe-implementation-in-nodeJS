@@ -294,26 +294,73 @@ const webHookEvent = async (req, res) => {
   }
 };
 
+// const transferFunds = async (req, res) => {
+//   const { amount, destinationAccountId } = req.body;
+//   if (!amount || !destinationAccountId) {
+//     console.log("amount or destination missing!");
+//     return res.status(400).json({ message: "amount or destination is required!" })
+//   }
+//   try {
+//     const transfer = await stripe.transfers.create({
+//       amount: amount * 100,
+//       currency: "USD",
+//       destination: destinationAccountId,
+//     });
+//     console.log("transfer is successfully made....", transfer);
+//     return res.status(201).json({ message: "transfer is made", data: transfer });
+
+//   } catch (error) {
+//     console.error("an error occured: ", error);
+//     return res.status(500).json({ message: error })
+//   }
+// };
+
 const transferFunds = async (req, res) => {
   const { amount, destinationAccountId } = req.body;
+  
   if (!amount || !destinationAccountId) {
-    console.log("amount or destination missing!");
-    return res.status(400).json({ message: "amount or destination is required!" })
+    console.log("amount or destinationAccountId missing!");
+    return res.status(400).json({ message: "amount or destinationAccountId is required!" });
   }
+
   try {
     const transfer = await stripe.transfers.create({
-      amount: amount * 100,
+      amount: amount * 100, 
       currency: "USD",
       destination: destinationAccountId,
     });
-    console.log("transfer is successfully made....", transfer);
-    return res.status(201).json({ message: "transfer is made", data: transfer });
+
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(transfer.balance_transaction);
+
+    console.log("Transfer successfully made:", transfer);
+    console.log("Balance transaction details:", balanceTransaction);
+
+    const response = {
+      message: "Transfer is made",
+      data: {
+        transfer: {
+          id: transfer.id,
+          amount: transfer.amount / 100, 
+          currency: transfer.currency,
+          destination: transfer.destination,
+          created: transfer.created,
+        },
+        fees: {
+          amount: balanceTransaction.fee / 100, 
+          currency: balanceTransaction.currency,
+          description: balanceTransaction.description,
+        }
+      }
+    };
+
+    return res.status(201).json(response);
 
   } catch (error) {
-    console.error("an error occured: ", error);
-    return res.status(500).json({ message: error })
+    console.error("An error occurred:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 module.exports = {
