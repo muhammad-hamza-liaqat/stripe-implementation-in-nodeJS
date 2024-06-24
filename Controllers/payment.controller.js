@@ -1,3 +1,4 @@
+const { application } = require("express");
 const statusCodes = require("http-status-codes");
 const stripe = require("stripe")(process.env.secret_key);
 
@@ -293,48 +294,73 @@ const webHookEvent = async (req, res) => {
   }
 };
 
-const transferFunds = async (req, res) => {
-  const { amount, currency, destination } = req.body;
+// const transferFunds = async (req, res) => {
+//   const { amount, destinationAccountId } = req.body;
+//   if (!amount || !destinationAccountId) {
+//     console.log("amount or destination missing!");
+//     return res.status(400).json({ message: "amount or destination is required!" })
+//   }
+//   try {
+//     const transfer = await stripe.transfers.create({
+//       amount: amount * 100,
+//       currency: "USD",
+//       destination: destinationAccountId,
+//     });
+//     console.log("transfer is successfully made....", transfer);
+//     return res.status(201).json({ message: "transfer is made", data: transfer });
 
-  console.log("Incoming request body:", req.body);
+//   } catch (error) {
+//     console.error("an error occured: ", error);
+//     return res.status(500).json({ message: error })
+//   }
+// };
+
+const transferFunds = async (req, res) => {
+  const { amount, destinationAccountId } = req.body;
+  
+  if (!amount || !destinationAccountId) {
+    console.log("amount or destinationAccountId missing!");
+    return res.status(400).json({ message: "amount or destinationAccountId is required!" });
+  }
 
   try {
-    if (!destination || !destination.account_number) {
-      return res
-        .status(400)
-        .json({ message: "Missing destination account number" });
-    }
-
-    const payoutDestination = {
-      type: "bank_account",
-      account_number: destination.account_number,
-      currency: currency,
-    };
-
-    console.log("Payout destination:", payoutDestination);
-
-    const payout = await stripe.payouts.create({
-      amount: amount * 100,
-      currency: currency,
-      destination: JSON.stringify(payoutDestination),
+    const transfer = await stripe.transfers.create({
+      amount: amount * 100, 
+      currency: "USD",
+      destination: destinationAccountId,
     });
 
-    console.log("Payout successful:", payout);
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(transfer.balance_transaction);
 
-    return res.status(201).json(payout);
+    console.log("Transfer successfully made:", transfer);
+    console.log("Balance transaction details:", balanceTransaction);
+
+    const response = {
+      message: "Transfer is made",
+      data: {
+        transfer: {
+          id: transfer.id,
+          amount: transfer.amount / 100, 
+          currency: transfer.currency,
+          destination: transfer.destination,
+          created: transfer.created,
+        },
+        fees: {
+          amount: balanceTransaction.fee / 100, 
+          currency: balanceTransaction.currency,
+          description: balanceTransaction.description,
+        }
+      }
+    };
+
+    return res.status(201).json(response);
+
   } catch (error) {
-    console.error("Error transferring funds:", error);
-    return res.status(500).json(error.message || error);
+    console.error("An error occurred:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// correct code
-
-// const transfer = await stripe.transfers.create({
-//   amount: amount,
-//   currency: currency,
-//   destination: destinationAccountId,
-// });
 
 
 module.exports = {
