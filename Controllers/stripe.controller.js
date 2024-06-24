@@ -164,36 +164,59 @@ const payoutStripe = async (req, res) => {
 };
 
 const createStripeCustomer = async (req, res) => {
-    const { email, paymentMethods, ...data } = req.body;
-
+    const { email, name } = req.body;
+    if (!email || !name) {
+        return res.status(400).json({ message: "all fields are required" })
+    }
     try {
         const customer = await stripe.customers.create({
             email: email,
-            ...data
+            name: name
         });
+        res.status(201).json({ message: "customer created", data: customer })
+    } catch (err) {
+        console.error('Error creating customer:', err);
+        return res.status(500).json({ message: "internal server error", error: err.message })
+    }
+};
 
-        for (const paymentMethodId of paymentMethods) {
-            await stripe.paymentMethods.attach(paymentMethodId, {
-                customer: customer.id,
-            });
+
+const addCardToCustomer = async (req, res) => {
+    const { card } = req.body;
+    const customerId = req.params.customerId
+
+    try {
+        if (!card || !customerId) {
+            return res.status(400).json({ message: "Card information and customerId are required" });
         }
 
-        if (paymentMethods.length > 0) {
-            await stripe.customers.update(customer.id, {
-                invoice_settings: {
-                    default_payment_method: paymentMethods[0],
+        const cards = Array.isArray(card) ? card : [card];
+
+        const addedCards = [];
+        for (const cardDetails of cards) {
+            const token = await stripe.tokens.create({
+                card: {
+                    number: cardDetails.number,
+                    exp_month: cardDetails.exp_month,
+                    exp_year: cardDetails.exp_year,
+                    cvc: cardDetails.cvc
                 }
             });
+
+            const cardSource = await stripe.customers.createSource(
+                customerId,
+                { source: token.id }
+            );
+
+            addedCards.push(cardSource);
         }
 
-        return res.status(201).json({ statusCode: 201, message: "Customer created successfully!", data: customer });
-
+        return res.status(201).json({ message: "Cards added successfully!", data: addedCards });
     } catch (error) {
-        console.error("An error occurred: ", error);
+        console.error("An error occurred:", error);
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
 
 
-
-module.exports = { createAccount, payoutStripe, createStripeCustomer };
+module.exports = { createAccount, payoutStripe, createStripeCustomer, addCardToCustomer };
