@@ -218,5 +218,23 @@ const addCardToCustomer = async (req, res) => {
     }
 };
 
+const cardsListing = async (req, res) => {
+    const customerId = req.params.customerId;
+    if (!customerId) {
+        return res.status(400).json({ message: "customerId not found in params! required!" });
+    }
+    try {
+        const customers = await stripe.customers.retrieve(customerId, {
+            expand: ['sources']
+        })
+        const cards = customers.sources.data.filter(source => source.object === "card")
+        return res.status(200).json({ message: " all cards fetched", data: cards })
 
-module.exports = { createAccount, payoutStripe, createStripeCustomer, addCardToCustomer };
+    } catch (error) {
+        console.log("an error occured: ", error);
+        return res.status(500).json({ message: "internal server error", error: error.message })
+    }
+}
+
+
+module.exports = { createAccount, payoutStripe, createStripeCustomer, addCardToCustomer, cardsListing };
