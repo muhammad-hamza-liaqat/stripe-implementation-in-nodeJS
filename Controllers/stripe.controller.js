@@ -224,7 +224,7 @@ const addCardToCustomer = async (req, res) => {
     const customerId = req.params.customerId;
 
     try {
-        if (!card ) {
+        if (!card) {
             return res.status(400).json({ message: "Card information is required" });
         }
 
@@ -262,22 +262,40 @@ const addCardToCustomer = async (req, res) => {
 
 
 const cardsListing = async (req, res) => {
-    const customerId = req.params.customerId;
+    const { customerId } = req.params;
     if (!customerId) {
         return res.status(400).json({ message: "customerId not found in params! required!" });
     }
-    try {
-        const customers = await stripe.customers.retrieve(customerId, {
-            expand: ['sources']
-        })
-        const cards = customers.sources.data.filter(source => source.object === "card")
-        return res.status(200).json({ message: " all cards fetched", data: cards })
 
+    try {
+        const customer = await stripe.customers.retrieve(customerId, {
+            expand: ['sources']
+        });
+
+        const defaultSourceId = customer.default_source;
+        const cards = customer.sources.data
+            .filter(source => source.object === "card")
+            .map(card => ({
+                ...card,
+                isDefault: card.id === defaultSourceId
+            }));
+
+        return res.status(200).json({
+            message: "All cards fetched",
+            data: cards
+        });
     } catch (error) {
-        console.log("an error occured: ", error);
-        return res.status(500).json({ message: "internal server error", error: error.message })
+        console.error("An error occurred while retrieving customer cards: ", error);
+
+        return res.status(500).json({
+            message: "internal server error",
+            error: error.message
+        });
     }
-}
+};
+
+
+
 
 const makeDefaultCard = async (req, res) => {
     const customerId = req.params.customerId;
@@ -313,7 +331,7 @@ const makePayment = async (req, res) => {
         const customer = await stripe.customers.retrieve(customerId);
         console.log('Retrieved customer:', customer);
 
-        const amount = 10 * 100; 
+        const amount = 10 * 100;
         const currency = 'usd';
 
         let paymentIntent;

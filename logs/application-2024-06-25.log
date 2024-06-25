@@ -58,3 +58,9 @@
 2024-06-25 14:29:18 info: POST /payment/cus_QMDxcCNU0Jxq95 - 27,412.302 ms
 2024-06-25 14:29:31 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
 2024-06-25 14:29:32 info: GET /cards/cus_QMDxcCNU0Jxq95 - 1,167.771 ms
+2024-06-25 14:38:10 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:38:16 info: GET /cards/cus_QMDxcCNU0Jxq95 - 6,178.041 ms
+2024-06-25 14:44:19 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:44:30 info: GET /cards/cus_QMDxcCNU0Jxq95 - 11,578.268 ms
+2024-06-25 14:47:13 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:47:26 info: GET /cards/cus_QMDxcCNU0Jxq95 - 13,223.442 ms
