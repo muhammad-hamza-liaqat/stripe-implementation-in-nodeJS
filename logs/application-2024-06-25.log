@@ -38,3 +38,23 @@
 2024-06-25 10:03:57 info: POST /add-card/cus_QM9mTHiLsTVpIu - 1,959.623 ms
 2024-06-25 10:04:07 info: POST /api/stripe/payment/cus_QM9mTHiLsTVpIu
 2024-06-25 10:04:09 info: POST /payment/cus_QM9mTHiLsTVpIu - 2,623.444 ms
+2024-06-25 14:17:42 info: POST /api/stripe/add-customer
+2024-06-25 14:17:53 info: POST /add-customer - 10,396.349 ms
+2024-06-25 14:19:16 info: POST /api/stripe/add-card/cus_QMDxcCNU0Jxq95
+2024-06-25 14:19:27 info: POST /add-card/cus_QMDxcCNU0Jxq95 - 10,843.297 ms
+2024-06-25 14:19:41 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:19:41 info: GET /cards/cus_QMDxcCNU0Jxq95 - 407.022 ms
+2024-06-25 14:20:04 info: POST /api/stripe/payment/cus_QMDxcCNU0Jxq95
+2024-06-25 14:20:09 info: POST /payment/cus_QMDxcCNU0Jxq95 - 5,680.984 ms
+2024-06-25 14:20:33 info: POST /api/stripe/add-card/cus_QMDxcCNU0Jxq95
+2024-06-25 14:20:34 info: POST /add-card/cus_QMDxcCNU0Jxq95 - 1,489.85 ms
+2024-06-25 14:20:42 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:20:45 info: GET /cards/cus_QMDxcCNU0Jxq95 - 2,814.644 ms
+2024-06-25 14:21:21 info: POST /api/stripe/payment/cus_QMDxcCNU0Jxq95
+2024-06-25 14:21:23 info: POST /payment/cus_QMDxcCNU0Jxq95 - 2,491.88 ms
+2024-06-25 14:27:13 info: POST /api/stripe/payment/cus_QMDxcCNU0Jxq95
+2024-06-25 14:27:20 info: POST /payment/cus_QMDxcCNU0Jxq95 - 7,306.505 ms
+2024-06-25 14:28:51 info: POST /api/stripe/payment/cus_QMDxcCNU0Jxq95
+2024-06-25 14:29:18 info: POST /payment/cus_QMDxcCNU0Jxq95 - 27,412.302 ms
+2024-06-25 14:29:31 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
+2024-06-25 14:29:32 info: GET /cards/cus_QMDxcCNU0Jxq95 - 1,167.771 ms

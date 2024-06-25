@@ -307,6 +307,116 @@ const makeDefaultCard = async (req, res) => {
 }
 
 
+// const makePayment = async (req, res) => {
+//     const customerId = req.params.customerId;
+
+//     try {
+//         const customer = await stripe.customers.retrieve(customerId);
+//         console.log('Retrieved customer:', customer);
+
+//         if (customer.invoice_settings && customer.invoice_settings.default_payment_method) {
+//             console.log('Default payment method:', customer.invoice_settings.default_payment_method);
+
+//             const paymentIntent = await stripe.paymentIntents.create({
+//                 amount: 10 * 100,
+//                 currency: 'usd',
+//                 customer: customerId,
+//                 payment_method: customer.invoice_settings.default_payment_method,
+//                 off_session: true,
+//                 confirm: true,
+//             });
+
+//             if (paymentIntent.status === 'succeeded') {
+//                 res.status(200).json({ message: 'Payment successful!', paymentIntent });
+//             } else {
+//                 for (const card of customer.sources.data) {
+//                     const altPaymentIntent = await stripe.paymentIntents.create({
+//                         amount: 10 * 100,
+//                         currency: 'usd',
+//                         customer: customerId,
+//                         payment_method: card.id,
+//                         off_session: true,
+//                         confirm: true,
+//                     });
+
+//                     if (altPaymentIntent.status === 'succeeded') {
+//                         return res.status(200).json({ message: 'Payment successful with alternate card!', paymentIntent: altPaymentIntent });
+//                     }
+//                 }
+
+//                 return res.status(400).json({ message: 'Payment failed with all cards.' });
+//             }
+//         } else {
+//             console.log('No default payment method found for customer:', customerId);
+//             return res.status(400).json({ message: 'No default payment method found.' });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ error: 'Internal server error', error: error.message });
+//     }
+// }
+
+// const makePayment = async (req, res) => {
+//     const customerId = req.params.customerId;
+
+//     try {
+//         const customer = await stripe.customers.retrieve(customerId);
+//         console.log('Retrieved customer:', customer);
+
+//         const amount = 10 * 100; // Amount in cents
+//         const currency = 'usd';
+
+//         let paymentIntent;
+
+//         if (customer.invoice_settings && customer.invoice_settings.default_payment_method) {
+//             console.log('Default payment method:', customer.invoice_settings.default_payment_method);
+
+//             try {
+//                 paymentIntent = await stripe.paymentIntents.create({
+//                     amount,
+//                     currency,
+//                     customer: customerId,
+//                     payment_method: customer.invoice_settings.default_payment_method,
+//                     off_session: true,
+//                     confirm: true,
+//                 });
+
+//                 if (paymentIntent.status === 'succeeded') {
+//                     return res.status(200).json({ message: 'Payment successful!', paymentIntent });
+//                 }
+//             } catch (error) {
+//                 console.error('Default payment method failed:', error.message);
+//             }
+//         }
+
+//         // If default payment method fails or does not exist, try other cards
+//         for (const card of customer.sources.data) {
+//             try {
+//                 paymentIntent = await stripe.paymentIntents.create({
+//                     amount,
+//                     currency,
+//                     customer: customerId,
+//                     payment_method: card.id,
+//                     off_session: true,
+//                     confirm: true,
+//                 });
+
+//                 if (paymentIntent.status === 'succeeded') {
+//                     return res.status(200).json({ message: 'Payment successful with alternate card!', paymentIntent });
+//                 }
+//             } catch (error) {
+//                 console.error('Alternate card payment method failed:', card.id, error.message);
+//             }
+//         }
+
+//         return res.status(400).json({ message: 'Payment failed with all cards.' });
+
+//     } catch (error) {
+//         console.error('Error:', error.message);
+//         res.status(500).json({ error: 'Internal server error', message: error.message });
+//     }
+// };
+
 const makePayment = async (req, res) => {
     const customerId = req.params.customerId;
 
@@ -314,48 +424,64 @@ const makePayment = async (req, res) => {
         const customer = await stripe.customers.retrieve(customerId);
         console.log('Retrieved customer:', customer);
 
+        const amount = 10 * 100; // Amount in cents
+        const currency = 'usd';
+
+        let paymentIntent;
+
         if (customer.invoice_settings && customer.invoice_settings.default_payment_method) {
             console.log('Default payment method:', customer.invoice_settings.default_payment_method);
 
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: 10 * 100,
-                currency: 'usd',
-                customer: customerId,
-                payment_method: customer.invoice_settings.default_payment_method,
-                off_session: true,
-                confirm: true,
-            });
+            try {
+                paymentIntent = await stripe.paymentIntents.create({
+                    amount,
+                    currency,
+                    customer: customerId,
+                    payment_method: customer.invoice_settings.default_payment_method,
+                    off_session: true,
+                    confirm: true,
+                });
 
-            if (paymentIntent.status === 'succeeded') {
-                res.status(200).json({ message: 'Payment successful!', paymentIntent });
-            } else {
-                for (const card of customer.sources.data) {
-                    const altPaymentIntent = await stripe.paymentIntents.create({
-                        amount: 10 * 100,
-                        currency: 'usd',
-                        customer: customerId,
-                        payment_method: card.id,
-                        off_session: true,
-                        confirm: true,
-                    });
-
-                    if (altPaymentIntent.status === 'succeeded') {
-                        return res.status(200).json({ message: 'Payment successful with alternate card!', paymentIntent: altPaymentIntent });
-                    }
+                if (paymentIntent.status === 'succeeded') {
+                    return res.status(200).json({ message: 'Payment successful!', paymentIntent });
                 }
-
-                return res.status(400).json({ message: 'Payment failed with all cards.' });
+            } catch (error) {
+                console.error('Default payment method failed:', error.message);
             }
-        } else {
-            console.log('No default payment method found for customer:', customerId);
-            return res.status(400).json({ message: 'No default payment method found.' });
         }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Internal server error', error: error.message });
-    }
-}
 
+        // If default payment method fails or does not exist, try other payment methods
+        const paymentMethods = await stripe.paymentMethods.list({
+            customer: customerId,
+            type: 'card',
+        });
+
+        for (const paymentMethod of paymentMethods.data) {
+            try {
+                paymentIntent = await stripe.paymentIntents.create({
+                    amount,
+                    currency,
+                    customer: customerId,
+                    payment_method: paymentMethod.id,
+                    off_session: true,
+                    confirm: true,
+                });
+
+                if (paymentIntent.status === 'succeeded') {
+                    return res.status(200).json({ message: 'Payment successful with alternate card!', paymentIntent });
+                }
+            } catch (error) {
+                console.error('Alternate payment method failed:', paymentMethod.id, error.message);
+            }
+        }
+
+        return res.status(400).json({ message: 'Payment failed with all cards.' });
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal server error', message: error.message });
+    }
+};
 
 
 module.exports = { createAccount, payoutStripe, createStripeCustomer, addCardToCustomer, cardsListing, makeDefaultCard, makePayment };
