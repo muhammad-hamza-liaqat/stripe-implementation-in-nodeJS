@@ -36,3 +36,5 @@
   "cvc": "123"
 }
 ```
+### command to make local tunnel for secure web request i-e (https)
+**npx localtunnel --port 3000 --subdomain stripe-server**

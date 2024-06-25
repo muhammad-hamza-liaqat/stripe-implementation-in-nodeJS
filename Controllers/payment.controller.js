@@ -1,3 +1,4 @@
+const { application } = require("express");
 const statusCodes = require("http-status-codes");
 const stripe = require("stripe")(process.env.secret_key);
 
@@ -138,36 +139,75 @@ const renderPaymentIntent = async (req, res) => {
   res.render("payment.pug");
 };
 
+// const checkoutSession = async (req, res) => {
+// // wihtout custom object ecommerce
+//   try {
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
+//       // payment_method_types: ["card"],
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "node.js and express book",
+//             },
+//             unit_amount: 500 * 100,
+//           },
+//           quantity: 1,
+//         },
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product_data: {
+//               name: "javascript t-shirt",
+//             },
+//             unit_amount: 20 * 100,
+//           },
+//           quantity: 2,
+//         },
+//       ],
+//       mode: "payment",
+//       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
+//     });
+
+//     // Redirect to Stripe Checkout page
+//     return res.redirect(session.url);
+//   } catch (error) {
+//     console.error("Error creating checkout session:", error.message || error);
+//     return res.status(500).json({ error: error.message || error });
+//   }
+// };
+
 const checkoutSession = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card", "amazon_pay", "klarna", "us_bank_account"],
-      // payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "node.js and express book",
+              name: "2D", // Or any relevant name
             },
             unit_amount: 500 * 100,
           },
           quantity: 1,
         },
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "javascript t-shirt",
-            },
-            unit_amount: 20 * 100,
-          },
-          quantity: 2,
-        },
       ],
       mode: "payment",
       success_url: `https://stripe-server.loca.lt/api/payment/complete?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: "https://stripe-server.loca.lt/api/payment/cancel",
+      metadata: {
+        lineItemsMetadata: JSON.stringify([
+          {
+            index: "0",
+            chainID: "660a428a002938f126abfc83",
+            nodeID: "660a428a002938f126abfc84",
+          },
+        ]),
+      },
     });
 
     // Redirect to Stripe Checkout page
@@ -179,17 +219,45 @@ const checkoutSession = async (req, res) => {
 };
 
 const complete = async (req, res) => {
-  const result = Promise.all([
-    stripe.checkout.sessions.retrieve(req.query.session_id, {
-      expand: ["payment_intent.payment_method"],
-    }),
-    stripe.checkout.sessions.listLineItems(req.query.session_id),
-  ]);
-  // console.log(JSON.stringify(await result));
-  return res
-    .status(statusCodes.OK)
-    .json({ message: "your payment was successful!" });
+  try {
+    const [session, lineItems] = await Promise.all([
+      stripe.checkout.sessions.retrieve(req.query.session_id, {
+        expand: ["payment_intent.payment_method"],
+      }),
+      stripe.checkout.sessions.listLineItems(req.query.session_id),
+    ]);
+
+    const customerDetails = session.customer_details;
+    const email = customerDetails.email;
+
+    if (!email) {
+      throw new Error("Customer email not found in session");
+    }
+
+    let customer;
+    const existingCustomers = await stripe.customers.list({ email: email });
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0];
+    } else {
+      customer = await stripe.customers.create({
+        email: email,
+        name: customerDetails.name,
+      });
+    }
+
+    const customerId = customer.id;
+
+    return res
+      .status(statusCodes.OK)
+      .json({ message: "Your payment was successful!", customerId });
+  } catch (error) {
+    console.error("Error completing payment:", error);
+    return res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.message });
+  }
 };
+
 const cancel = async (req, res) => {
   res.render("page.pug");
 };
@@ -226,6 +294,75 @@ const webHookEvent = async (req, res) => {
   }
 };
 
+// const transferFunds = async (req, res) => {
+//   const { amount, destinationAccountId } = req.body;
+//   if (!amount || !destinationAccountId) {
+//     console.log("amount or destination missing!");
+//     return res.status(400).json({ message: "amount or destination is required!" })
+//   }
+//   try {
+//     const transfer = await stripe.transfers.create({
+//       amount: amount * 100,
+//       currency: "USD",
+//       destination: destinationAccountId,
+//     });
+//     console.log("transfer is successfully made....", transfer);
+//     return res.status(201).json({ message: "transfer is made", data: transfer });
+
+//   } catch (error) {
+//     console.error("an error occured: ", error);
+//     return res.status(500).json({ message: error })
+//   }
+// };
+
+const transferFunds = async (req, res) => {
+  const { amount, destinationAccountId } = req.body;
+  
+  if (!amount || !destinationAccountId) {
+    console.log("amount or destinationAccountId missing!");
+    return res.status(400).json({ message: "amount or destinationAccountId is required!" });
+  }
+
+  try {
+    const transfer = await stripe.transfers.create({
+      amount: amount * 100, 
+      currency: "USD",
+      destination: destinationAccountId,
+    });
+
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(transfer.balance_transaction);
+
+    console.log("Transfer successfully made:", transfer);
+    console.log("Balance transaction details:", balanceTransaction);
+
+    const response = {
+      message: "Transfer is made",
+      data: {
+        transfer: {
+          id: transfer.id,
+          amount: transfer.amount / 100, 
+          currency: transfer.currency,
+          destination: transfer.destination,
+          created: transfer.created,
+        },
+        fees: {
+          amount: balanceTransaction.fee / 100, 
+          currency: balanceTransaction.currency,
+          description: balanceTransaction.description,
+        }
+      }
+    };
+
+    return res.status(201).json(response);
+
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
 module.exports = {
   // addCard,
   addCustomer,
@@ -236,4 +373,5 @@ module.exports = {
   complete,
   cancel,
   webHookEvent,
+  transferFunds,
 };

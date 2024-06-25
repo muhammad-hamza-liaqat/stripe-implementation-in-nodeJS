@@ -224,31 +224,43 @@ const addCardToCustomer = async (req, res) => {
     const customerId = req.params.customerId;
 
     try {
-        if (!card ) {
-            return res.status(400).json({ message: "Card information is required" });
+        if (!card || !customerId) {
+            return res.status(400).json({ message: "Card information and customerId are required" });
         }
 
-        const token = await stripe.tokens.create({
-            card: {
-                number: card.number,
-                exp_month: card.exp_month,
-                exp_year: card.exp_year,
-                cvc: card.cvc,
-                name: card.name || null,
+        const cards = Array.isArray(card) ? card : [card];
 
+        const addedCards = [];
+        let defaultCardId;
+
+        for (const cardDetails of cards) {
+            const token = await stripe.tokens.create({
+                card: {
+                    number: cardDetails.number,
+                    exp_month: cardDetails.exp_month,
+                    exp_year: cardDetails.exp_year,
+                    cvc: cardDetails.cvc
+                }
+            });
+
+            const cardSource = await stripe.customers.createSource(
+                customerId,
+                { source: token.id }
+            );
+
+            addedCards.push(cardSource);
+
+            if (cardDetails.default) {
+                console.log("card default")
+                defaultCardId = cardSource.id;
             }
-        });
+        }
 
-        const cardSource = await stripe.customers.createSource(
-            customerId,
-            { source: token.id }
-        );
-
-        if (card.default) {
-            console.log("inside card default");
+        if (defaultCardId) {
+            console.log("default 2")
             await stripe.customers.update(customerId, {
                 invoice_settings: {
-                    default_payment_method: cardSource.id
+                    default_payment_method: defaultCardId
                 }
             });
         }
