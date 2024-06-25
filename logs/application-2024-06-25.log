@@ -96,3 +96,11 @@
 2024-06-25 15:12:40 info: PATCH /default-card/cus_QMEgwVnOjqwfqF/card_1PVWDcGi1bsyWjuiIWrvSxi6 - 6,025.776 ms
 2024-06-25 15:12:55 info: POST /api/stripe/payment/cus_QMEgwVnOjqwfqF
 2024-06-25 15:12:59 info: POST /payment/cus_QMEgwVnOjqwfqF - 4,695.687 ms
+2024-06-25 15:23:12 info: POST /api/stripe/add-customer
+2024-06-25 15:23:14 info: POST /add-customer - 2,067.305 ms
+2024-06-25 15:23:46 info: POST /api/stripe/add-card/cus_QMF0XRkcEHTleb
+2024-06-25 15:23:50 info: POST /add-card/cus_QMF0XRkcEHTleb - 3,638.232 ms
+2024-06-25 15:24:06 info: POST /api/stripe/add-card/cus_QMF0XRkcEHTleb
+2024-06-25 15:24:09 info: POST /add-card/cus_QMF0XRkcEHTleb - 2,953.462 ms
+2024-06-25 15:24:43 info: GET /api/stripe/cards/cus_QMF0XRkcEHTleb
+2024-06-25 15:24:44 info: GET /cards/cus_QMF0XRkcEHTleb - 528.944 ms
