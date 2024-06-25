@@ -224,43 +224,31 @@ const addCardToCustomer = async (req, res) => {
     const customerId = req.params.customerId;
 
     try {
-        if (!card || !customerId) {
-            return res.status(400).json({ message: "Card information and customerId are required" });
+        if (!card ) {
+            return res.status(400).json({ message: "Card information is required" });
         }
 
-        const cards = Array.isArray(card) ? card : [card];
-
-        const addedCards = [];
-        let defaultCardId;
-
-        for (const cardDetails of cards) {
-            const token = await stripe.tokens.create({
-                card: {
-                    number: cardDetails.number,
-                    exp_month: cardDetails.exp_month,
-                    exp_year: cardDetails.exp_year,
-                    cvc: cardDetails.cvc
-                }
-            });
-
-            const cardSource = await stripe.customers.createSource(
-                customerId,
-                { source: token.id }
-            );
-
-            addedCards.push(cardSource);
-
-            if (cardDetails.default) {
-                console.log("card default")
-                defaultCardId = cardSource.id;
+        const token = await stripe.tokens.create({
+            card: {
+                number: card.number,
+                exp_month: card.exp_month,
+                exp_year: card.exp_year,
+                cvc: card.cvc,
+                name: card.name || null,
             }
-        }
+        });
 
-        if (defaultCardId) {
-            console.log("default 2")
+        const cardSource = await stripe.customers.createSource(
+            customerId,
+            { source: token.id }
+        );
+
+        if (card.default) {
+            console.log("inside card.default");
+            console.log("card default ------------------->", card.default);
             await stripe.customers.update(customerId, {
                 invoice_settings: {
-                    default_payment_method: defaultCardId
+                    default_payment_method: cardSource.id
                 }
             });
         }
@@ -268,9 +256,10 @@ const addCardToCustomer = async (req, res) => {
         return res.status(201).json({ message: "Card added successfully!", data: cardSource });
     } catch (error) {
         console.error("An error occurred:", error);
-        return res.status(500).json({ message: "internal server error", error: error.message })
+        return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
+
 
 const cardsListing = async (req, res) => {
     const customerId = req.params.customerId;
