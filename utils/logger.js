@@ -26,13 +26,16 @@ const logger = createLogger({
   ]
 });
 
-// Middleware to log request duration
+// Middleware to log request duration, status, and user agent
 const logRequestDuration = (req, res, next) => {
   const start = process.hrtime();
 
   res.on('finish', () => {
     const durationInMilliseconds = getDurationInMilliseconds(start);
-    logger.info(`${req.method} ${req.url} - ${durationInMilliseconds.toLocaleString()} ms`);
+    const status = res.statusCode;
+    const userAgent = req.headers['user-agent'];
+
+    logger.info(`${req.method} ${req.url} - ${status} - ${durationInMilliseconds.toLocaleString()} ms - ${userAgent}`);
   });
 
   next();

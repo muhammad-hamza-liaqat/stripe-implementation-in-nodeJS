@@ -1,2 +1,4 @@
 2024-06-25 16:35:15 info: POST /api/stripe/add-customer
 2024-06-25 16:36:03 info: POST /add-customer - 48,070.827 ms
+2024-06-25 16:49:01 info: POST /api/stripe/add-customer
+2024-06-25 16:49:03 info: POST /add-customer - 201 - 1,681.351 ms - PostmanRuntime/7.39.0
