@@ -258,33 +258,41 @@ const cardsListing = async (req, res) => {
 
 
 
-
 const makeDefaultCard = async (req, res) => {
-    const customerId = req.params.customerId;
-    const cardId = req.params.cardId;
+    const { customerId, cardId } = req.params;
     if (!customerId || !cardId) {
-        return res.status(400).json({ message: "customerId, cardId are required!" })
+        return res.status(400).json({ message: "customerId and cardId are required!" });
     }
+
     try {
-
-
-        const customer = await stripe.customers.retrieve(customerId);
-
         await stripe.customers.update(customerId, {
             default_source: cardId
         });
 
-        const updatedCustomer = await stripe.customers.retrieve(customerId);
+        const updatedCustomer = await stripe.customers.retrieve(customerId, {
+            expand: ['sources']
+        });
+
+        const defaultSourceId = updatedCustomer.default_source;
+        const cards = updatedCustomer.sources.data
+            .filter(source => source.object === "card")
+            .map(card => ({
+                ...card,
+                isDefault: card.id === defaultSourceId
+            }));
 
         return res.status(200).json({
             message: "Default card updated",
-            data: updatedCustomer
+            data: cards
         });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Failed to update default card' });
     }
-}
+};
+
+
+
 
 const makePayment = async (req, res) => {
     const customerId = req.params.customerId;

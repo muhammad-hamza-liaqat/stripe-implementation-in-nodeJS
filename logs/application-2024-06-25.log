@@ -64,3 +64,35 @@
 2024-06-25 14:44:30 info: GET /cards/cus_QMDxcCNU0Jxq95 - 11,578.268 ms
 2024-06-25 14:47:13 info: GET /api/stripe/cards/cus_QMDxcCNU0Jxq95
 2024-06-25 14:47:26 info: GET /cards/cus_QMDxcCNU0Jxq95 - 13,223.442 ms
+2024-06-25 14:57:54 info: POST /api/stripe/add-customer
+2024-06-25 14:58:07 info: POST /add-customer - 12,674.902 ms
+2024-06-25 14:58:33 info: POST /api/stripe/add-card/cus_QMEbPx531E3nyP
+2024-06-25 14:58:43 info: POST /add-card/cus_QMEbPx531E3nyP - 10,155.551 ms
+2024-06-25 14:59:37 info: GET /api/stripe/cards/cus_QMEbPx531E3nyP
+2024-06-25 14:59:42 info: GET /cards/cus_QMEbPx531E3nyP - 4,896.61 ms
+2024-06-25 15:00:00 info: POST /api/stripe/payment/cus_QMEbPx531E3nyP
+2024-06-25 15:00:06 info: POST /payment/cus_QMEbPx531E3nyP - 6,028.633 ms
+2024-06-25 15:02:38 info: POST /api/stripe/add-customer
+2024-06-25 15:02:51 info: POST /add-customer - 12,632.636 ms
+2024-06-25 15:03:18 info: POST /api/stripe/add-card/cus_QMEgwVnOjqwfqF
+2024-06-25 15:03:21 info: POST /add-card/cus_QMEgwVnOjqwfqF - 2,369.954 ms
+2024-06-25 15:03:43 info: POST /api/stripe/payment/cus_QMEgwVnOjqwfqF
+2024-06-25 15:03:47 info: POST /payment/cus_QMEgwVnOjqwfqF - 3,901.452 ms
+2024-06-25 15:04:58 info: POST /api/stripe/add-card/cus_QMEgwVnOjqwfqF
+2024-06-25 15:05:00 info: POST /add-card/cus_QMEgwVnOjqwfqF - 2,171.757 ms
+2024-06-25 15:05:18 info: GET /api/stripe/cards/cus_QMEgwVnOjqwfqF
+2024-06-25 15:05:20 info: GET /cards/cus_QMEgwVnOjqwfqF - 1,469.814 ms
+2024-06-25 15:06:14 info: PATCH /api/stripe/default-card/cus_QMEgwVnOjqwfqF/card_1PVWFDGi1bsyWjuiUUjn7Hsh
+2024-06-25 15:06:15 info: PATCH /default-card/cus_QMEgwVnOjqwfqF/card_1PVWFDGi1bsyWjuiUUjn7Hsh - 1,740.573 ms
+2024-06-25 15:07:39 info: POST /api/stripe/payment/cus_QMEgwVnOjqwfqF
+2024-06-25 15:07:48 info: POST /payment/cus_QMEgwVnOjqwfqF - 9,318.909 ms
+2024-06-25 15:09:15 info: GET /api/stripe/cards/cus_QMEgwVnOjqwfqF
+2024-06-25 15:09:19 info: GET /cards/cus_QMEgwVnOjqwfqF - 4,232.302 ms
+2024-06-25 15:09:49 info: PATCH /api/stripe/default-card/cus_QMEgwVnOjqwfqF/card_1PVWDcGi1bsyWjuiIWrvSxi6
+2024-06-25 15:09:51 info: PATCH /default-card/cus_QMEgwVnOjqwfqF/card_1PVWDcGi1bsyWjuiIWrvSxi6 - 1,279.854 ms
+2024-06-25 15:10:41 info: POST /api/stripe/payment/cus_QMEgwVnOjqwfqF
+2024-06-25 15:10:46 info: POST /payment/cus_QMEgwVnOjqwfqF - 5,028.82 ms
+2024-06-25 15:12:34 info: PATCH /api/stripe/default-card/cus_QMEgwVnOjqwfqF/card_1PVWDcGi1bsyWjuiIWrvSxi6
+2024-06-25 15:12:40 info: PATCH /default-card/cus_QMEgwVnOjqwfqF/card_1PVWDcGi1bsyWjuiIWrvSxi6 - 6,025.776 ms
+2024-06-25 15:12:55 info: POST /api/stripe/payment/cus_QMEgwVnOjqwfqF
+2024-06-25 15:12:59 info: POST /payment/cus_QMEgwVnOjqwfqF - 4,695.687 ms
