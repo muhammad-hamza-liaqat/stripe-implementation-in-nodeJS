@@ -340,6 +340,7 @@ const makePayment = async (req, res) => {
                 }
             } catch (error) {
                 console.error('Default payment method failed:', error.message);
+                return res.status(500).json({message: "internal server error", error: error.message})
             }
         }
 
@@ -360,7 +361,7 @@ const makePayment = async (req, res) => {
                 });
 
                 if (paymentIntent.status === 'succeeded') {
-                    return res.status(200).json({ message: 'Payment successful with alternate card!', paymentIntent });
+                    return res.status(200).json({ message: 'Payment successful', paymentIntent });
                 }
             } catch (error) {
                 console.error('Alternate payment method failed:', paymentMethod.id, error.message);
