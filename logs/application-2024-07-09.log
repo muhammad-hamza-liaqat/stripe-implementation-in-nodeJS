@@ -1,0 +1,16 @@
+2024-07-09 16:49:28 info: GET /api/stripe/paymentIntent
+2024-07-09 16:49:28 info: GET /api/stripe/paymentIntent - 404 - 8.322 ms - PostmanRuntime/7.39.0
+2024-07-09 16:49:32 info: POST /api/stripe/paymentIntent
+2024-07-09 16:49:32 info: POST /paymentIntent - 500 - 9.785 ms - PostmanRuntime/7.39.0
+2024-07-09 16:50:39 info: POST /api/stripe/paymentIntent
+2024-07-09 16:50:43 info: POST /paymentIntent - 201 - 4,029.185 ms - PostmanRuntime/7.39.0
+2024-07-09 16:52:21 info: POST /api/stripe/paymentIntent
+2024-07-09 16:52:24 info: POST /paymentIntent - 201 - 2,778.307 ms - PostmanRuntime/7.39.0
+2024-07-09 16:52:54 info: POST /api/stripe/paymentIntent
+2024-07-09 16:52:56 info: POST /paymentIntent - 201 - 1,748.897 ms - PostmanRuntime/7.39.0
+2024-07-09 16:56:52 info: POST /api/stripe/paymentIntent
+2024-07-09 16:56:55 info: POST /paymentIntent - 201 - 2,802.392 ms - PostmanRuntime/7.39.0
+2024-07-09 16:58:35 info: POST /api/stripe/paymentIntent
+2024-07-09 16:58:38 info: POST /paymentIntent - 201 - 2,830.772 ms - PostmanRuntime/7.39.0
+2024-07-09 17:01:24 info: POST /api/stripe/paymentIntent
+2024-07-09 17:01:31 info: POST /paymentIntent - 200 - 7,191.386 ms - PostmanRuntime/7.39.0
