@@ -407,39 +407,49 @@ const makePayment = async (req, res) => {
 
 const paymentIntentWithoutCardSaving = async (req, res) => {
     const { amount, currency, number, exp_month, exp_year, cvc } = req.body;
-  
-    try {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, 
-        currency: currency,
-        payment_method_types: ['card'],
-        payment_method_data: {
-          type: 'card',
-          card: {
-            number: number,
-            exp_month: exp_month,
-            exp_year: exp_year,
-            cvc: cvc,
-          },
-        },
-      });
-  
-      console.log("PaymentIntent created:", paymentIntent);
-  
-      if (paymentIntent.status === 'requires_confirmation') {
-        const confirmedIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
-  
-        return res.status(200).json({ message: 'Payment Intent confirmed', paymentIntent: confirmedIntent });
-      } else {
-        return res.status(200).json({ message: 'Payment recorded successfully', data: paymentIntent });
-      }
-  
-    } catch (error) {
-      console.error("An error occurred:", error);
-      return res.status(500).json({ message: "Internal server error", error: error.message });
-    }
-  };
-  
 
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount * 100,
+            currency: currency,
+            payment_method_types: ['card'],
+            payment_method_data: {
+                type: 'card',
+                card: {
+                    number: number,
+                    exp_month: exp_month,
+                    exp_year: exp_year,
+                    cvc: cvc,
+                },
+            },
+        });
+
+        console.log("PaymentIntent created:", paymentIntent);
+
+        if (paymentIntent.status === 'requires_confirmation') {
+            const confirmedIntent = await stripe.paymentIntents.confirm(paymentIntent.id);
+
+            return res.status(200).json({ message: 'Payment Intent confirmed', paymentIntent: confirmedIntent });
+        } else {
+            return res.status(200).json({ message: 'Payment recorded successfully', data: paymentIntent });
+        }
+
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
+
+// paymentIntentWithoutCardSaving json->
+// endPoint -> http://localhost:3000/api/stripe/paymentIntent
+// {
+//     "amount": 200,
+//     "currency": "USD",
+//     "number": "4242 4242 4242 4242",
+//     "exp_month": "08",
+//     "exp_year": "29",
+//     "cvc": "123"
+
+// }
 
 module.exports = { createAccount, payoutStripe, createStripeCustomer, addCardToCustomer, cardsListing, makeDefaultCard, makePayment, paymentIntentWithoutCardSaving };
