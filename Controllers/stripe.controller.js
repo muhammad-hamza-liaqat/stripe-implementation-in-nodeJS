@@ -376,35 +376,6 @@ const makePayment = async (req, res) => {
     }
 };
 
-
-// const paymentIntentWithoutCardSaving = async (req, res) => {
-//     const { amount, currency, number, exp_month, exp_year, cvc } = req.body;
-
-//     try {
-//         const paymentIntent = await stripe.paymentIntents.create({
-//             amount: amount * 100,
-//             currency: currency,
-//             payment_method_types: ['card'],
-//             payment_method_data: {
-//                 type: 'card',
-//                 card: {
-//                     number: number,
-//                     exp_month: exp_month,
-//                     exp_year: exp_year,
-//                     cvc: cvc,
-//                 },
-//             },
-//         });
-
-//         console.log("PaymentIntent created:", paymentIntent);
-//         return res.status(201).json({ message: "Payment recorded successfully", data: paymentIntent });
-//     } catch (error) {
-//         console.error("An error occurred:", error);
-//         return res.status(500).json({ message: "Internal server error", error: error.message });
-//     }
-// };
-
-
 const paymentIntentWithoutCardSaving = async (req, res) => {
     const { amount, currency, number, exp_month, exp_year, cvc } = req.body;
 
